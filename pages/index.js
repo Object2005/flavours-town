@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- TUMHARI SARI 19 ITEMS ---
 const fullMenu = [
   { id: 1, category: "Chaap", name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, orders: 190, time: "15 min", img: "/img/malai-chaap.jpg", inStock: true },
   { id: 2, category: "Chaap", name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, orders: 120, time: "15 min", img: "/img/masala-chaap.jpg", inStock: true },
@@ -52,30 +51,24 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen pb-44 font-sans">
+    <div className="bg-[#f5f5f7] min-h-screen pb-60 font-sans selection:bg-orange-500/30">
       <Head>
-        <title>Flavour's Town App</title>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <title>Flavour's Town | Created by Aashray</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-        
-        {/* --- MANIFEST LINK ADDED HERE BY ME --- */}
         <link rel="manifest" href="/manifest.json" />
       </Head>
 
+      {/* HEADER */}
       <header className="fixed top-0 w-full z-[100] px-4 py-4 backdrop-blur-3xl bg-white/70 border-b border-gray-100">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-black italic tracking-tighter text-orange-600 uppercase">Flavour's Town</h1>
+          <h1 className="text-xl font-black italic tracking-tighter text-orange-600">FLAVOUR'S TOWN</h1>
           <div className="flex items-center gap-3">
-            <div className="bg-gray-100 p-1 rounded-xl flex">
-              <button onClick={() => setLang('pu')} className={`px-3 py-1.5 rounded-lg text-[10px] font-black ${lang === 'pu' ? 'bg-orange-600 text-white' : 'text-gray-400'}`}>ਪੰ</button>
-              <button onClick={() => setLang('en')} className={`px-3 py-1.5 rounded-lg text-[10px] font-black ${lang === 'en' ? 'bg-orange-600 text-white' : 'text-gray-400'}`}>EN</button>
-            </div>
             <button onClick={handleAdminToggle} className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${isAdmin ? 'bg-orange-600 text-white' : 'bg-white text-gray-400'}`}>⚙️</button>
           </div>
         </div>
       </header>
 
+      {/* CATEGORY NAV */}
       <nav className="pt-24 pb-4 px-4 max-w-7xl mx-auto flex gap-2 overflow-x-auto no-scrollbar relative z-30">
         {categories.map(cat => (
           <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shrink-0 ${activeCategory === cat ? 'bg-orange-600 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100'}`}>
@@ -84,28 +77,26 @@ export default function Home() {
         ))}
       </nav>
 
-      {/* MOBILE 2 COLUMN GRID */}
+      {/* MENU GRID: MOBILE 2-COLUMN */}
       <main className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-10">
-        {menu.filter(i => activeCategory === "All" || i.category.includes(activeCategory)).map(item => (
+        {menu.filter(i => activeCategory === "All" || i.category === activeCategory).map(item => (
           <motion.div layout key={item.id} className={`bg-white rounded-[2.5rem] p-4 md:p-6 shadow-xl border border-white transition-all ${!item.inStock ? 'opacity-40 grayscale' : ''}`}>
             <div className="relative rounded-[1.8rem] overflow-hidden mb-4 h-36 md:h-64 shadow-md">
               <img src={item.img} className="w-full h-full object-cover" />
-              {item.orders > 200 && <div className="absolute bottom-2 left-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-[8px] md:text-[10px] font-black uppercase">🔥 Best</div>}
             </div>
-
             <div className="text-center">
               <h3 className="text-[12px] md:text-xl font-black mb-1 uppercase tracking-tighter leading-tight h-8 flex items-center justify-center">{item.name[lang]}</h3>
               <p className="text-orange-600 font-black text-lg md:text-3xl italic mb-4">₹{item.price}</p>
               
               {isAdmin ? (
                 <button onClick={() => setMenu(menu.map(m => m.id === item.id ? {...m, inStock: !m.inStock} : m))} className={`w-full py-2 rounded-xl text-[9px] font-black border ${item.inStock ? 'border-red-500 text-red-500' : 'border-green-500 text-green-500'}`}>
-                  {item.inStock ? "OUT OF STOCK" : "IN STOCK"}
+                  {item.inStock ? "STOCK OFF" : "STOCK ON"}
                 </button>
               ) : (
                 <div className="flex items-center justify-between bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
-                  <button onClick={() => setCart({...cart, [item.id]: Math.max(0, (cart[item.id] || 0) - 1)})} className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-white shadow-sm font-black text-orange-600">-</button>
-                  <span className="font-black text-sm md:text-xl">{cart[item.id] || 0}</span>
-                  <button onClick={() => setCart({...cart, [item.id]: (cart[item.id] || 0) + 1})} disabled={!item.inStock} className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-orange-600 text-white shadow-md font-black text-xl">+</button>
+                  <button onClick={() => setCart({...cart, [item.id]: Math.max(0, (cart[item.id] || 0) - 1)})} className="w-9 h-9 rounded-xl bg-white shadow-sm font-black text-orange-600">-</button>
+                  <span className="font-black text-sm">{cart[item.id] || 0}</span>
+                  <button onClick={() => setCart({...cart, [item.id]: (cart[item.id] || 0) + 1})} disabled={!item.inStock} className="w-9 h-9 rounded-xl bg-orange-600 text-white shadow-md font-black text-sm">+</button>
                 </div>
               )}
             </div>
@@ -113,31 +104,55 @@ export default function Home() {
         ))}
       </main>
 
+      {/* DEVELOPER FOOTER */}
+      <footer className="mt-20 px-6 py-12 bg-white border-t border-gray-100 text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Crafted with ❤️ by</p>
+        <h2 className="text-2xl font-black italic text-gray-800 mb-6">AASHRAY NARANG</h2>
+        
+        <div className="flex justify-center gap-8 mb-8 text-[10px] font-black uppercase tracking-widest text-gray-500">
+          <a href="https://github.com/Object2005" target="_blank" className="hover:text-black transition-colors">GitHub</a>
+          <a href="https://linkedin.com/in/aashraynarang" target="_blank" className="hover:text-blue-600 transition-colors">LinkedIn</a>
+          <a href="mailto:aashraynarang@gmail.com" className="hover:text-orange-600 transition-colors">Email</a>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+          <a href="https://maps.google.com/?q=Flavours+Town+Malout" target="_blank" className="bg-gray-100 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-tighter flex items-center justify-center gap-2">📍 Location</a>
+          <a href="tel:+919877474778" className="bg-gray-100 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-tighter flex items-center justify-center gap-2">📞 Call Us</a>
+        </div>
+      </footer>
+
+      {/* ANIMATED CART BAR */}
       <AnimatePresence>
         {total > 0 && (
-          <div className="fixed bottom-6 left-0 right-0 z-[100] px-4 flex justify-center">
-            <button onClick={() => setShowCheckout(true)} className="max-w-4xl w-full bg-orange-600 p-5 md:p-8 rounded-[2.5rem] shadow-2xl flex justify-between items-center text-white">
+          <motion.div 
+            initial={{ y: 150, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            exit={{ y: 150, opacity: 0 }}
+            className="fixed bottom-6 left-0 right-0 z-[110] px-4 flex justify-center"
+          >
+            <button onClick={() => setShowCheckout(true)} className="max-w-md w-full bg-orange-600 p-6 rounded-[2.5rem] shadow-2xl flex justify-between items-center text-white ring-4 ring-white/20 active:scale-95 transition-transform">
                <div className="flex items-center gap-4 italic">
-                  <div className="bg-white/20 h-12 w-12 md:h-20 md:w-20 rounded-2xl flex items-center justify-center text-xl md:text-4xl shadow-inner text-white">🍽️</div>
+                  <div className="bg-white/20 h-12 w-12 rounded-2xl flex items-center justify-center text-2xl text-white">🛒</div>
                   <div className="text-left leading-none">
-                    <p className="text-[8px] md:text-[10px] font-black uppercase opacity-60 mb-1 text-white">My Bill</p>
-                    <p className="text-2xl md:text-5xl font-black tracking-tighter text-white">₹{total}</p>
+                    <p className="text-[8px] font-black uppercase opacity-60 mb-1 text-white">Cart Total</p>
+                    <p className="text-2xl font-black tracking-tighter text-white">₹{total}</p>
                   </div>
                </div>
-               <div className="bg-white text-black px-6 md:px-12 py-3 md:py-5 rounded-2xl md:rounded-[2rem] font-black text-[10px] uppercase tracking-widest shadow-xl">Order →</div>
+               <div className="bg-white text-black px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest">Order →</div>
             </button>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
+      {/* CHECKOUT MODAL */}
       <AnimatePresence>
         {showCheckout && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[200] flex items-center justify-center p-6 text-center">
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[200] flex items-center justify-center p-6 text-center">
             <div className="bg-white p-10 rounded-[3.5rem] max-w-sm w-full shadow-2xl">
-              <h2 className="text-2xl font-black uppercase italic mb-6 text-gray-800">Final Order</h2>
-              <p className="text-orange-600 font-black text-5xl mb-8 italic">₹{total}</p>
-              <button onClick={sendOrder} className="w-full bg-green-600 text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl mb-4 transition-all active:scale-95">Send on WhatsApp</button>
-              <button onClick={() => setShowCheckout(false)} className="text-gray-400 text-[10px] font-black uppercase">Go Back</button>
+              <h2 className="text-2xl font-black uppercase italic mb-6 text-gray-800 tracking-tighter">Final Bill</h2>
+              <p className="text-orange-600 font-black text-6xl mb-10 italic">₹{total}</p>
+              <button onClick={sendOrder} className="w-full bg-green-600 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-xl mb-4 transition-all active:scale-95">WhatsApp Order</button>
+              <button onClick={() => setShowCheckout(false)} className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Close</button>
             </div>
           </motion.div>
         )}
