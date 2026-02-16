@@ -7,51 +7,44 @@ const firebaseConfig = { apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", auth
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 
-export default function FinalAuth() {
+export default function Login() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
   const [step, setStep] = useState(1);
-  const [result, setResult] = useState(null);
+  const [confirm, setConfirm] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (localStorage.getItem('ft_user')) router.push('/');
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-box', { 'size': 'invisible' });
+  useEffect(() => { 
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
   }, []);
 
-  const sendOTP = async () => {
-    try {
-      const res = await signInWithPhoneNumber(auth, `+91${phone}`, window.recaptchaVerifier);
-      setResult(res); setStep(2);
-    } catch (e) { alert("OTP Error: " + e.message); }
+  const onSendOTP = async () => {
+    const res = await signInWithPhoneNumber(auth, `+91${phone}`, window.recaptchaVerifier);
+    setConfirm(res); setStep(2);
   };
 
-  const verifyOTP = async () => {
-    try {
-      await result.confirm(otp);
-      localStorage.setItem('ft_user', JSON.stringify({ name, phone }));
-      router.push('/');
-    } catch (e) { alert("Galt OTP!"); }
+  const onVerify = async () => {
+    await confirm.confirm(otp);
+    localStorage.setItem('ft_user', JSON.stringify({ name, phone, id: Date.now() }));
+    router.push('/');
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-10 font-sans">
-      <div id="recaptcha-box"></div>
-      <div className="w-full max-w-sm">
-        <h1 className="text-4xl font-black italic text-orange-600 mb-2 uppercase tracking-tighter">Enter Town</h1>
-        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] mb-12">Verified Access Only</p>
-        
+    <div className="min-h-screen bg-[#fcfbf7] flex flex-col items-center justify-center p-6 font-sans">
+      <div id="recaptcha-container"></div>
+      <div className="w-full max-w-sm bg-white p-10 rounded-[3rem] shadow-xl border border-gray-100">
+        <h1 className="text-3xl font-black italic text-orange-600 text-center mb-8 tracking-tighter uppercase">Town Login</h1>
         {step === 1 ? (
           <div className="space-y-4">
-            <input type="text" placeholder="Your Name" className="w-full p-6 bg-gray-50 rounded-3xl font-bold outline-none" onChange={e=>setName(e.target.value)} />
-            <input type="tel" placeholder="Phone Number" className="w-full p-6 bg-gray-50 rounded-3xl font-bold outline-none" onChange={e=>setPhone(e.target.value)} />
-            <button onClick={sendOTP} className="w-full py-6 bg-orange-600 text-white rounded-[2.5rem] font-black uppercase tracking-widest shadow-xl shadow-orange-600/20">Get OTP</button>
+            <input type="text" placeholder="Your Name" className="w-full p-5 bg-gray-50 rounded-2xl font-bold outline-none border-none" onChange={e=>setName(e.target.value)} />
+            <input type="tel" placeholder="Phone Number" className="w-full p-5 bg-gray-50 rounded-2xl font-bold outline-none border-none" onChange={e=>setPhone(e.target.value)} />
+            <button onClick={onSendOTP} className="w-full py-5 bg-orange-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-lg shadow-orange-600/30 transition-all active:scale-95">Send OTP</button>
           </div>
         ) : (
           <div className="space-y-4">
-            <input type="number" placeholder="6-Digit OTP" className="w-full p-6 bg-gray-100 rounded-3xl font-bold text-center text-2xl tracking-[0.5em]" onChange={e=>setOtp(e.target.value)} />
-            <button onClick={verifyOTP} className="w-full py-6 bg-black text-white rounded-[2.5rem] font-black uppercase tracking-widest">Verify & Login</button>
+            <input type="number" placeholder="Enter OTP" className="w-full p-5 bg-gray-50 rounded-2xl font-black text-center text-2xl tracking-[0.5em] outline-none" onChange={e=>setOtp(e.target.value)} />
+            <button onClick={onVerify} className="w-full py-5 bg-black text-white rounded-[2rem] font-black uppercase tracking-widest transition-all active:scale-95">Verify & Enter</button>
           </div>
         )}
       </div>
