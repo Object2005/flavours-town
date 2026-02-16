@@ -1,133 +1,104 @@
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import { getDatabase, ref, onValue, set, update } from "firebase/database";
 
-// --- CONFIG ---
 const firebaseConfig = { apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", authDomain: "flavourstown-83891.firebaseapp.com", databaseURL: "https://flavourstown-83891-default-rtdb.firebaseio.com", projectId: "flavourstown-83891", storageBucket: "flavourstown-83891.firebasestorage.app", messagingSenderId: "631949771733", appId: "1:631949771733:web:16e025bbc443493242735c" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const APP_NAME = "The Flavours Town";
+
+const OWNER_NAME = "Aashray Narang";
+const OWNER_PHONE = "919877474778"; 
 
 export default function Home() {
-  const router = useRouter();
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userOrder, setUserOrder] = useState(null);
+  const [isShopOpen, setIsShopOpen] = useState(true);
+  const [payMethod, setPayMethod] = useState('UPI');
 
   useEffect(() => {
     const saved = localStorage.getItem('ft_user');
-    if (!saved) router.push('/auth');
-    else setUser(JSON.parse(saved));
+    if (saved) setUser(JSON.parse(saved));
 
-    onValue(ref(db, 'menu'), snap => {
-      setMenu(snap.exists() ? snap.val() : []);
-      setLoading(false);
+    onValue(ref(db, 'shopStatus'), snap => setIsShopOpen(snap.exists() ? snap.val() : true));
+    onValue(ref(db, 'menu'), snap => setMenu(snap.exists() ? snap.val() : []));
+    
+    // Live Tracking
+    onValue(ref(db, 'orders'), snap => {
+      if (snap.exists() && saved) {
+        const u = JSON.parse(saved);
+        const active = Object.values(snap.val()).find(o => o.user?.phone === u.phone && o.status !== 'Delivered');
+        setUserOrder(active || null);
+      }
     });
-  }, [router]);
+  }, []);
 
-  const total = cart.reduce((a, b) => a + (b.price || 0), 0);
-
-  if (loading || !user) return (
-    <div className="min-h-screen bg-[#fcfbf7] flex items-center justify-center">
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full" />
-    </div>
-  );
+  const placeOrder = () => {
+    const orderId = `FT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const total = cart.reduce((a, b) => a + b.price, 0);
+    const orderData = { id: orderId, user, items: cart, total, status: 'Received', method: payMethod, timestamp: new Date().toISOString() };
+    
+    set(ref(db, 'orders/' + orderId), orderData);
+    setCart([]);
+    alert("Order Placed! Tracking Live Now.");
+  };
 
   return (
-    <div className="min-h-screen bg-[#fcfbf7] text-[#1a1a1a] font-sans">
-      <Head><title>{APP_NAME}</title></Head>
-
-      {/* --- FLOATING HEADER --- */}
-      <header className="fixed top-5 left-5 right-5 z-[100] bg-white/80 backdrop-blur-xl border border-white/20 px-6 py-4 flex justify-between items-center rounded-3xl shadow-sm">
-        <h1 className="font-black italic text-orange-600 text-lg uppercase tracking-tighter">
-          {APP_NAME}
-        </h1>
-        <div className="flex items-center gap-2 bg-gray-100/50 px-4 py-2 rounded-full">
-           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-           <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Hi, {user.name.split(' ')[0]}</span>
-        </div>
+    <div className="min-h-screen bg-[#fcfbf7] pb-40">
+      <header className="p-6 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <h1 className="font-black italic text-orange-600">THE FLAVOURS TOWN</h1>
+        {!isShopOpen && <span className="bg-red-500 text-white text-[10px] px-3 py-1 rounded-full font-black">CLOSED</span>}
       </header>
 
-      <main className="pt-32 pb-44 px-6 max-w-5xl mx-auto">
-        {/* --- HERO SECTION --- */}
-        <section className="mb-12">
-            <h2 className="text-5xl font-black italic tracking-tighter leading-[0.9] mb-4 text-gray-900 uppercase">
-                Malout’s Most <br/> 
-                <span className="text-orange-600 relative inline-block">
-                  Wanted
-                  <span className="absolute bottom-1 left-0 w-full h-2 bg-orange-600/10 -z-10"></span>
-                </span> Taste.
-            </h2>
-            <p className="text-[11px] font-bold opacity-40 uppercase tracking-[0.2em]">Freshly cooked every single day</p>
-        </section>
+      <main className="p-6">
+        {/* BLINKIT STYLE LIVE STATUS */}
+        {userOrder && (
+          <div className="mb-8 p-6 bg-white rounded-[2rem] border border-orange-100 shadow-xl shadow-orange-600/5">
+            <div className="flex justify-between items-center mb-4">
+               <h3 className="font-black text-xs uppercase tracking-widest text-orange-600 italic">Live Tracking</h3>
+               <span className="text-[10px] font-bold opacity-30">#{userOrder.id}</span>
+            </div>
+            <div className="flex gap-2 mb-4">
+              {['Received', 'Cooking', 'Ready'].map((s, i) => (
+                <div key={s} className={`h-1 flex-1 rounded-full ${userOrder.status === s || (i < 1 && userOrder.status === 'Cooking') || (i < 2 && userOrder.status === 'Ready') ? 'bg-orange-600' : 'bg-gray-100'}`} />
+              ))}
+            </div>
+            <p className="text-xl font-black italic uppercase tracking-tighter">
+                {userOrder.status === 'Received' && '📦 Order Received'}
+                {userOrder.status === 'Cooking' && '👨‍🍳 Chef is Frying'}
+                {userOrder.status === 'Ready' && '🔥 Ready for Pickup'}
+            </p>
+          </div>
+        )}
 
-        {/* --- MENU GRID --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menu.map((p, idx) => (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.05 }}
-              key={p.id} 
-              className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500"
-            >
-              <div className="relative h-60 overflow-hidden bg-gray-50">
-                <motion.img 
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.6 }}
-                  src={p.img} 
-                  className="w-full h-full object-cover" 
-                />
-                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl text-xs font-black italic shadow-sm">
-                  ₹{p.price}
-                </div>
-              </div>
-
-              <div className="p-6">
-                <h3 className="text-sm font-black uppercase tracking-tight text-gray-800 mb-1">{p.name?.en}</h3>
-                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest mb-6 italic">Fresh & Hot</p>
-
-                <motion.button 
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setCart([...cart, p])}
-                  disabled={!p.inStock}
-                  className="w-full py-4 bg-[#1a1a1a] hover:bg-orange-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
-                >
-                  {p.inStock ? 'Add to Tray +' : 'Sold Out'}
-                </motion.button>
-              </div>
-            </motion.div>
+        {/* MENU */}
+        <div className="grid grid-cols-2 gap-4">
+          {menu.map(p => (
+            <div key={p.id} className={`bg-white p-4 rounded-[2rem] border border-gray-50 ${!p.inStock || !isShopOpen ? 'opacity-40' : ''}`}>
+               <img src={p.img} className="w-full h-32 object-cover rounded-2xl mb-3" />
+               <h4 className="font-black text-[11px] uppercase">{p.name.en}</h4>
+               <p className="text-orange-600 font-black italic">₹{p.price}</p>
+               <button onClick={() => setCart([...cart, p])} disabled={!isShopOpen || !p.inStock} className="mt-2 w-full py-2 bg-gray-900 text-white rounded-xl text-[10px] font-black uppercase">Add +</button>
+            </div>
           ))}
         </div>
       </main>
 
-      {/* --- FLOATING CHECKOUT BAR --- */}
+      {/* CHECKOUT WITH PAYMENT */}
       <AnimatePresence>
         {cart.length > 0 && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-5 right-5 z-[200] max-w-lg mx-auto"
-          >
-            <div className="bg-white/90 backdrop-blur-2xl border border-white/20 p-5 rounded-[2.5rem] shadow-2xl flex justify-between items-center px-8">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black opacity-30 uppercase tracking-widest">Tray Total</span>
-                <span className="text-2xl font-black italic text-gray-900">₹{total}</span>
-              </div>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-orange-600 text-white px-10 py-5 rounded-[1.8rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-orange-600/30"
-              >
-                Place Order →
-              </motion.button>
+          <motion.div initial={{y:100}} animate={{y:0}} className="fixed bottom-0 left-0 right-0 p-8 bg-white rounded-t-[3rem] shadow-2xl border-t z-[100]">
+            <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
+               {['UPI', 'CASH'].map(m => (
+                 <button key={m} onClick={() => setPayMethod(m)} className={`px-6 py-3 rounded-full text-[10px] font-black ${payMethod === m ? 'bg-orange-600 text-white' : 'bg-gray-100 opacity-40'}`}>{m}</button>
+               ))}
             </div>
+            <button onClick={placeOrder} className="w-full py-5 bg-orange-600 text-white rounded-[2rem] font-black uppercase flex justify-between px-10">
+               <span>Pay with {payMethod}</span>
+               <span className="italic font-black text-lg">₹{cart.reduce((a,b)=>a+b.price,0)} →</span>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
