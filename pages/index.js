@@ -3,29 +3,30 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIG ---
-// NOTE: Ensure your /public/img/ folder has these exact filenames.
+const ADMIN_PASS = "aashray778";
+const UPI_ID = "9877474778@paytm"; // Tera UPI ID (Direct Payment Layi)
 
-// --- YOUR ORIGINAL LOCAL IMAGES ---
+// --- MENU DATA (LOCAL IMAGES) ---
 const initialMenuData = [
-  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, img: "/img/malai-chaap.jpg" },
-  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, img: "/img/masala-chaap.jpg" },
-  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, img: "/img/afghani-chaap.jpg" },
-  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, img: "/img/achari-chaap.jpg" },
-  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, img: "/img/paneer-tikka.jpg" },
-  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, img: "/img/mushroom-tikka.jpg" },
-  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 50, rating: 4.4, img: "/img/frankie.jpg" },
-  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 90, rating: 4.7, img: "/img/paneer-roll.jpg" },
-  { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 70, rating: 4.6, img: "/img/chaap-roll.jpg" },
+  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 120, rating: 4.8, img: "/img/malai-chaap.jpg" },
+  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 110, rating: 4.7, img: "/img/masala-chaap.jpg" },
+  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 130, rating: 4.9, img: "/img/afghani-chaap.jpg" },
+  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 110, rating: 4.6, img: "/img/achari-chaap.jpg" },
+  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 160, rating: 4.9, img: "/img/paneer-tikka.jpg" },
+  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 150, rating: 4.5, img: "/img/mushroom-tikka.jpg" },
+  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 60, rating: 4.4, img: "/img/frankie.jpg" },
+  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 100, rating: 4.7, img: "/img/paneer-roll.jpg" },
+  { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 90, rating: 4.6, img: "/img/chaap-roll.jpg" },
   { id: 10, category: "Rolls", isBest: false, name: { en: "Mushroom Roll", pu: "ਮਸ਼ਰੂਮ ਰੋਲ" }, price: 90, rating: 4.5, img: "/img/mushroom-roll.jpg" },
-  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 50, rating: 4.8, img: "/img/pav-bhaji.jpg" },
-  { id: 12, category: "Rolls", isBest: false, name: { en: "Twister Roll", pu: "ਟਵਿਸਟਰ ਰੋਲ" }, price: 50, rating: 4.3, img: "/img/twister.jpg" },
-  { id: 13, category: "Snacks", isBest: false, name: { en: "Paneer Bhurji Kulcha", pu: "ਪਨੀਰ ਭੁਰਜੀ ਕੁਲਚਾ" }, price: 90, rating: 4.8, img: "/img/kulcha.jpg" },
-  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 250, rating: 4.9, img: "/img/cheese-chilli.jpg" },
-  { id: 15, category: "Snacks", isBest: false, name: { en: "Kacha Paneer", pu: "ਕੱਚਾ ਪਨੀਰ" }, price: 50, rating: 4.2, img: "/img/kacha-paneer.jpg" },
-  { id: 16, category: "Snacks", isBest: false, name: { en: "Paneer Fry", pu: "ਪਨੀਰ ਫਰਾਈ" }, price: 130, rating: 4.7, img: "/img/paneer-fry.jpg" },
-  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 20, rating: 4.9, img: "/img/gulab-jamun.jpg" },
-  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 30, rating: 5.0, img: "/img/rabri-jamun.jpg" },
-  { id: 19, category: "Sweets", isBest: false, name: { en: "Garam Gajrela", pu: "ਗਰਮ ਗਜਰੇਲਾ" }, price: 50, rating: 4.9, img: "/img/gajrela.jpg" }
+  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 80, rating: 4.8, img: "/img/pav-bhaji.jpg" },
+  { id: 12, category: "Rolls", isBest: false, name: { en: "Twister Roll", pu: "ਟਵਿਸਟਰ ਰੋਲ" }, price: 80, rating: 4.3, img: "/img/twister.jpg" },
+  { id: 13, category: "Snacks", isBest: false, name: { en: "Paneer Bhurji Kulcha", pu: "ਪਨੀਰ ਭੁਰਜੀ ਕੁਲਚਾ" }, price: 140, rating: 4.7, img: "/img/kulcha.jpg" },
+  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 220, rating: 4.9, img: "/img/cheese-chilli.jpg" },
+  { id: 15, category: "Snacks", isBest: false, name: { en: "Kacha Paneer", pu: "ਕੱਚਾ ਪਨੀਰ" }, price: 100, rating: 4.2, img: "/img/kacha-paneer.jpg" },
+  { id: 16, category: "Snacks", isBest: false, name: { en: "Paneer Fry", pu: "ਪਨੀਰ ਫਰਾਈ" }, price: 180, rating: 4.7, img: "/img/paneer-fry.jpg" },
+  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 40, rating: 4.9, img: "/img/gulab-jamun.jpg" },
+  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 60, rating: 5.0, img: "/img/rabri-jamun.jpg" },
+  { id: 19, category: "Sweets", isBest: false, name: { en: "Garam Gajrela", pu: "ਗਰਮ ਗਜਰੇਲਾ" }, price: 60, rating: 4.9, img: "/img/gajrela.jpg" }
 ];
 
 // --- ADDONS DATA ---
@@ -36,7 +37,7 @@ const addonsData = [
   { id: 'p2', name: "Packing Charge", price: 10 }
 ];
 
-// --- COUNTDOWN COMPONENT ---
+// --- COUNTDOWN TIMER ---
 const CountdownTimer = ({ targetDate }) => {
   const [display, setDisplay] = useState("Wait...");
   useEffect(() => {
@@ -56,59 +57,9 @@ const CountdownTimer = ({ targetDate }) => {
   return <span className="font-mono text-orange-500 font-bold tracking-widest">{display}</span>;
 };
 
-// --- QR SCANNER (FIXED) ---
-const QRScanner = ({ onClose }) => {
-    const videoRef = useRef(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        let stream = null;
-        const startCamera = async () => {
-            try {
-                // Request camera with playsInline for iOS
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
-                });
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    // Required for some mobile browsers to actually play
-                    videoRef.current.play();
-                }
-            } catch (err) {
-                console.error("Camera Error:", err);
-                setError("Camera permission denied or not available.");
-            }
-        };
-        startCamera();
-        return () => { if(stream) stream.getTracks().forEach(t => t.stop()); }
-    }, []);
-
-    return (
-        <div className="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center p-4">
-            <h2 className="text-white font-black text-xl mb-6">SCAN CART QR</h2>
-            <div className="w-full max-w-xs aspect-square bg-zinc-900 border-4 border-orange-500 rounded-3xl overflow-hidden relative shadow-[0_0_50px_orange]">
-                {error ? (
-                    <p className="text-red-500 text-center p-8 font-bold">{error}<br/><span className="text-white text-xs font-normal">Check browser permissions</span></p>
-                ) : (
-                    <video 
-                        ref={videoRef} 
-                        autoPlay 
-                        playsInline 
-                        muted 
-                        className="w-full h-full object-cover" 
-                    />
-                )}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-white/30 animate-pulse rounded-lg"></div>
-            </div>
-            <p className="text-gray-500 text-xs mt-4 text-center">Use another phone to pay if scanning fails.</p>
-            <button onClick={onClose} className="mt-8 bg-white text-black px-8 py-3 rounded-full font-bold">CLOSE</button>
-        </div>
-    );
-};
-
 export default function Home() {
   const [cart, setCart] = useState([]);
-  const [addons, setAddons] = useState({}); 
+  const [addons, setAddons] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
   const [liveOrders, setLiveOrders] = useState([]);
   const [myOrder, setMyOrder] = useState(null);
@@ -116,7 +67,6 @@ export default function Home() {
   const [userDetails, setUserDetails] = useState({ name: '', phone: '' });
   const [searchQuery, setSearchQuery] = useState("");
   const [showCheckout, setShowCheckout] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
   const [prepTime, setPrepTime] = useState(20);
   const [lang, setLang] = useState('pu');
@@ -129,16 +79,18 @@ export default function Home() {
     setSessionOrderId(`FT-${Math.floor(1000 + Math.random() * 9000)}`);
     if ("Notification" in window) Notification.requestPermission();
     
-    // Load Saved Data
-    const savedMenu = localStorage.getItem('ft_v17_menu');
+    // Load Local Data
+    const savedMenu = localStorage.getItem('ft_v18_menu');
     if (savedMenu) setMenu(JSON.parse(savedMenu));
 
+    // SYNC LOOP
     const interval = setInterval(() => {
-        const storedOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
+        const storedOrders = JSON.parse(localStorage.getItem('ft_v18_orders') || '[]');
         setLiveOrders(storedOrders);
         const myActive = storedOrders.find(o => o.id === sessionOrderId);
         if (myActive) setMyOrder(myActive);
         
+        // Admin Sound
         if (isAdmin && storedOrders.length > liveOrders.length) {
              try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){}
         }
@@ -149,6 +101,20 @@ export default function Home() {
   // --- LOGIC ---
   const subtotal = cart.reduce((acc, i) => acc + i.price, 0) + 
                    addonsData.reduce((acc, ad) => acc + (ad.price * (addons[ad.id] || 0)), 0);
+
+  // --- DIRECT PAYMENT HANDLERS ---
+  const handleDirectPayment = () => {
+      if (!userDetails.name || !userDetails.phone) return alert("Please enter Name & Phone first!");
+      
+      // Construct UPI Deep Link
+      const upiUrl = `upi://pay?pa=${UPI_ID}&pn=FlavoursTown&am=${subtotal}&cu=INR`;
+      
+      // Open App
+      window.location.href = upiUrl;
+      
+      // Also place order as Pending
+      placeOrder('UPI_DIRECT');
+  };
 
   const placeOrder = (method) => {
     if (!userDetails.name || !userDetails.phone) return alert("Please enter Name & Phone!");
@@ -174,22 +140,22 @@ export default function Home() {
         timestamp: new Date().toISOString()
     };
 
-    const currentOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
-    localStorage.setItem('ft_v17_orders', JSON.stringify([...currentOrders, newOrder]));
+    const currentOrders = JSON.parse(localStorage.getItem('ft_v18_orders') || '[]');
+    localStorage.setItem('ft_v18_orders', JSON.stringify([...currentOrders, newOrder]));
     setMyOrder(newOrder); setCart([]); setAddons({}); setShowCheckout(false);
   };
 
   const updateStatus = (id, status) => {
-      const allOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
+      const allOrders = JSON.parse(localStorage.getItem('ft_v18_orders') || '[]');
       const updated = allOrders.map(o => o.id === id ? { ...o, status } : o);
-      localStorage.setItem('ft_v17_orders', JSON.stringify(updated));
+      localStorage.setItem('ft_v18_orders', JSON.stringify(updated));
       setLiveOrders(updated);
   };
 
   const toggleStock = (id) => {
       const updatedMenu = menu.map(i => i.id === id ? { ...i, inStock: !i.inStock } : i);
       setMenu(updatedMenu);
-      localStorage.setItem('ft_v17_menu', JSON.stringify(updatedMenu));
+      localStorage.setItem('ft_v18_menu', JSON.stringify(updatedMenu));
   };
 
   const filteredItems = menu.filter(i => {
@@ -200,9 +166,7 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen font-sans selection:bg-orange-500/30 overflow-x-hidden transition-colors duration-500 ${isDark ? 'bg-[#050505] text-white' : 'bg-[#fcfbf7] text-black'}`}>
-      <Head><title>Flavour's Town V17</title></Head>
-
-      {showScanner && <QRScanner onClose={() => setShowScanner(false)} />}
+      <Head><title>Flavour's Town V18</title></Head>
 
       {/* --- HEADER --- */}
       <header className={`fixed top-0 w-full z-[100] px-4 py-3 backdrop-blur-xl border-b flex justify-between items-center transition-all ${isDark ? 'bg-black/60 border-white/5' : 'bg-white/80 border-black/5'}`}>
@@ -213,7 +177,7 @@ export default function Home() {
         <div className="flex gap-2">
             <button onClick={() => setIsDark(!isDark)} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>{isDark ? '☀️' : '🌙'}</button>
             {!isAdmin && <button onClick={() => setLang(lang==='pu'?'en':'pu')} className={`px-3 py-1 border rounded-lg text-[9px] font-black ${isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'}`}>{lang==='pu'?'EN':'ਪੰ'}</button>}
-            <button onClick={() => { const p=prompt("Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs hover:bg-orange-600 transition-all ${isDark ? 'bg-white/5' : 'bg-black/5'}`}>⚙️</button>
+            <button onClick={() => { const p=prompt("Pass:"); if(p===ADMIN_PASS) setIsAdmin(!isAdmin); }} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs hover:bg-orange-600 transition-all ${isDark ? 'bg-white/5' : 'bg-black/5'}`}>⚙️</button>
         </div>
       </header>
 
@@ -226,7 +190,7 @@ export default function Home() {
                     <h2 className="text-2xl font-black italic text-orange-500">LIVE ORDERS</h2>
                     <div className="flex gap-2">
                         <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`px-4 py-2 rounded-full text-[10px] font-bold ${isKitchenOpen ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>{isKitchenOpen ? 'OPEN' : 'CLOSED'}</button>
-                        <button onClick={() => { if(confirm("Reset?")) localStorage.removeItem('ft_v17_orders'); }} className="text-[10px] text-red-500 underline">RESET</button>
+                        <button onClick={() => { if(confirm("Reset?")) localStorage.removeItem('ft_v18_orders'); }} className="text-[10px] text-red-500 underline">RESET</button>
                     </div>
                 </div>
                 
@@ -350,7 +314,7 @@ export default function Home() {
                 <motion.div initial={{y:100}} animate={{y:0}} className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
                     <button onClick={() => setShowCheckout(true)} className="w-full bg-orange-600 text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center">
                         <span className="font-bold text-[10px] uppercase bg-black/20 px-3 py-1 rounded-lg">{cart.length} Items</span>
-                        <span className="font-black text-lg italic">₹{subtotal} <span className="text-xs font-normal opacity-70 ml-1">Place Order </span></span>
+                        <span className="font-black text-lg italic">₹{subtotal} <span className="text-xs font-normal opacity-70 ml-1">Place Order ></span></span>
                     </button>
                 </motion.div>
             )}
@@ -372,7 +336,7 @@ export default function Home() {
             )}
         </AnimatePresence>
 
-        {/* --- CHECKOUT DRAWER --- */}
+        {/* --- CHECKOUT DRAWER (UPDATED FOR DIRECT UPI) --- */}
         <AnimatePresence>
             {showCheckout && (
                 <motion.div initial={{y:'100%'}} animate={{y:0}} exit={{y:'100%'}} className="fixed inset-0 z-[200] p-6 pt-12 overflow-y-auto lg:flex lg:items-center lg:justify-center bg-black/80 backdrop-blur-sm">
@@ -412,7 +376,10 @@ export default function Home() {
                         </div>
                         
                         <div className="space-y-3">
-                            <button onClick={() => setShowScanner(true)} className="w-full bg-zinc-800 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest border border-white/10 flex items-center justify-center gap-2 animate-pulse hover:bg-zinc-700">📷 SCAN & PAY (UPI)</button>
+                            {/* --- DIRECT PAYMENT BUTTON --- */}
+                            <button onClick={handleDirectPayment} className="w-full bg-zinc-800 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest border border-white/10 flex items-center justify-center gap-2 hover:bg-zinc-700 animate-pulse">
+                                ⚡ PAY VIA UPI (GPay / Paytm)
+                            </button>
                             <button onClick={() => placeOrder('COD')} className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 shadow-lg">PAY CASH ON DELIVERY</button>
                             <button onClick={() => placeOrder('WA')} className="w-full bg-[#25D366] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:opacity-90">WHATSAPP ORDER</button>
                         </div>
