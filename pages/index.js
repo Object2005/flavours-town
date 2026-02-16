@@ -285,7 +285,7 @@ export default function Home() {
                 <motion.div initial={{y:100}} animate={{y:0}} className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
                     <button onClick={() => setShowCheckout(true)} className="w-full bg-orange-600 text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center">
                         <span className="font-bold text-[10px] uppercase bg-black/20 px-3 py-1 rounded-lg">{cart.length} Items</span>
-                        <span className="font-black text-lg italic">₹{cart.reduce((a,b)=>a+b.price, 0)} <span className="text-xs font-normal opacity-70 ml-1">Place Order ></span></span>
+                        <span className="font-black text-lg italic">₹{cart.reduce((a,b)=>a+b.price, 0)} <span className="text-xs font-normal opacity-70 ml-1">Place Order </span></span>
                     </button>
                 </motion.div>
             )}
