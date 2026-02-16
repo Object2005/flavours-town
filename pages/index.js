@@ -2,215 +2,344 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- CONFIG: GEMINI AI POWER ---
-const GEMINI_API_KEY = "AIzaSyD6BGkKRa7yl1eZNyvIS6WOkD2iu0axRKw"; 
-
+// --- ULTIMATE 19 ITEMS DATA ---
 const initialMenuData = [
-  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, reviews: 1240, img: "/img/malai-chaap.jpg", desc: "Creamy, rich and melt-in-the-mouth chaap." },
-  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, reviews: 890, img: "/img/masala-chaap.jpg", desc: "Spicy and tangy masala infused chaap." },
-  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, reviews: 1560, img: "/img/afghani-chaap.jpg", desc: "Traditional Afghani spices and yogurt marination." },
-  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, reviews: 750, img: "/img/achari-chaap.jpg", desc: "Tangy pickle flavored soya chunks." },
-  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, reviews: 2100, img: "/img/paneer-tikka.jpg", desc: "Classic tandoori paneer with bell peppers." },
-  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, reviews: 430, img: "/img/mushroom-tikka.jpg", desc: "Fresh mushrooms roasted in clay oven." },
-  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 50, rating: 4.4, reviews: 620, img: "/img/frankie.jpg", desc: "Mumbai style spicy veg roll." },
-  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 90, rating: 4.7, reviews: 940, img: "/img/paneer-roll.jpg", desc: "Stuffed with spicy paneer and sauces." },
-  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 50, rating: 4.8, reviews: 1800, img: "/img/pav-bhaji.jpg", desc: "Butter loaded bhaji with soft pav." },
-  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 250, rating: 4.9, reviews: 1100, img: "/img/cheese-chilli.jpg", desc: "Indo-Chinese favorite spicy cheese chunks." },
-  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 20, rating: 4.9, reviews: 3000, img: "/img/gulab-jamun.jpg", desc: "Hot syrup-soaked dessert balls." },
-  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 30, rating: 5.0, reviews: 2500, img: "/img/rabri-jamun.jpg", desc: "Legendary combo of rabri and jamun." }
+  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, reviews: 1240, img: "/img/malai-chaap.jpg" },
+  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, reviews: 890, img: "/img/masala-chaap.jpg" },
+  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, reviews: 1560, img: "/img/afghani-chaap.jpg" },
+  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, reviews: 750, img: "/img/achari-chaap.jpg" },
+  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, reviews: 2100, img: "/img/paneer-tikka.jpg" },
+  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, reviews: 430, img: "/img/mushroom-tikka.jpg" },
+  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 50, rating: 4.4, reviews: 620, img: "/img/frankie.jpg" },
+  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 90, rating: 4.7, reviews: 940, img: "/img/paneer-roll.jpg" },
+  { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 70, rating: 4.6, reviews: 510, img: "/img/chaap-roll.jpg" },
+  { id: 10, category: "Rolls", isBest: false, name: { en: "Mushroom Roll", pu: "ਮਸ਼ਰੂਮ ਰੋਲ" }, price: 90, rating: 4.5, reviews: 320, img: "/img/mushroom-roll.jpg" },
+  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 50, rating: 4.8, reviews: 1800, img: "/img/pav-bhaji.jpg" },
+  { id: 12, category: "Rolls", isBest: false, name: { en: "Twister Roll", pu: "ਟਵਿਸਟਰ ਰੋਲ" }, price: 50, rating: 4.3, reviews: 210, img: "/img/twister.jpg" },
+  { id: 13, category: "Snacks", isBest: false, name: { en: "Paneer Bhurji Kulcha", pu: "ਪਨੀਰ ਭੁਰਜੀ ਕੁਲਚਾ" }, price: 90, rating: 4.8, reviews: 770, img: "/img/kulcha.jpg" },
+  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 250, rating: 4.9, reviews: 1100, img: "/img/cheese-chilli.jpg" },
+  { id: 15, category: "Snacks", isBest: false, name: { en: "Kacha Paneer", pu: "ਕੱਚਾ ਪਨੀਰ" }, price: 50, rating: 4.2, reviews: 150, img: "/img/kacha-paneer.jpg" },
+  { id: 16, category: "Snacks", isBest: false, name: { en: "Paneer Fry", pu: "ਪਨੀਰ ਫਰਾਈ" }, price: 130, rating: 4.7, reviews: 420, img: "/img/paneer-fry.jpg" },
+  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 20, rating: 4.9, reviews: 3000, img: "/img/gulab-jamun.jpg" },
+  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 30, rating: 5.0, reviews: 2500, img: "/img/rabri-jamun.jpg" },
+  { id: 19, category: "Sweets", isBest: false, name: { en: "Garam Gajrela", pu: "ਗਰਮ ਗਜਰੇਲਾ" }, price: 50, rating: 4.9, reviews: 1300, img: "/img/gajrela.jpg" }
+];
+
+const addonsData = [
+  { id: 'r1', name: { en: "Rumali Roti", pu: "ਰੁਮਾਲੀ ਰੋਟੀ" }, price: 10 },
+  { id: 'r2', name: { en: "Garlic Nan", pu: "ਗਾਰਲਿਕ ਨਾਨ" }, price: 40 },
+  { id: 'p1', name: { en: "Extra Packing", pu: "ਪੈਕਿੰਗ" }, price: 10 }
 ];
 
 export default function Home() {
-  const [view, setView] = useState('HOME');
+  const [view, setView] = useState('HOME'); // 'HOME' or 'CHECKOUT'
+  const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
-  const [isDark, setIsDark] = useState(true);
+  const [addons, setAddons] = useState({});
   const [lang, setLang] = useState('pu');
+  const [isDark, setIsDark] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [prepTime, setPrepTime] = useState(20);
+  const [isKitchenOpen, setIsKitchenOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [orderStatus, setOrderStatus] = useState(null);
+  const [cookingProgress, setCookingProgress] = useState(0);
+  const [showCustomizer, setShowCustomizer] = useState(null);
+  const [customOptions, setCustomOptions] = useState({ spice: 'Medium' });
   const [sessionOrderId, setSessionOrderId] = useState('');
-  
-  // AI & VOICE LOGIC
-  const [isAiOpen, setIsAiOpen] = useState(false);
-  const [aiChat, setAiChat] = useState([{ role: 'bot', text: 'Sat Sri Akal Veer! Blinkit ton fast order chahida?' }]);
-  const [aiInput, setAiInput] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const scrollRefs = useRef({});
 
   const haptic = () => { if (typeof window !== "undefined" && window.navigator.vibrate) window.navigator.vibrate(50); };
 
   useEffect(() => {
     setSessionOrderId(`FT-${Math.floor(1000 + Math.random() * 9000)}`);
+    const savedMenu = localStorage.getItem('ft_v10_menu');
+    if (savedMenu) setMenu(JSON.parse(savedMenu));
+    else setMenu(initialMenuData.map(i => ({ ...i, inStock: true })));
+
+    const savedKitchen = localStorage.getItem('ft_v10_kitchen');
+    if (savedKitchen !== null) setIsKitchenOpen(JSON.parse(savedKitchen));
+
+    const savedPrep = localStorage.getItem('ft_v10_prep');
+    if (savedPrep) setPrepTime(parseInt(savedPrep));
   }, []);
 
-  const subtotal = cart.reduce((acc, i) => acc + i.price, 0);
-  const deliveryFee = subtotal > 0 ? 25 : 0;
-  const taxes = subtotal * 0.05;
-  const grandTotal = subtotal + deliveryFee + taxes;
+  useEffect(() => {
+    if (menu.length > 0) localStorage.setItem('ft_v10_menu', JSON.stringify(menu));
+    localStorage.setItem('ft_v10_kitchen', JSON.stringify(isKitchenOpen));
+    localStorage.setItem('ft_v10_prep', prepTime.toString());
+  }, [menu, isKitchenOpen, prepTime]);
 
-  const runOrderFlow = () => {
-    setOrderStatus('CONFIRMING');
+  useEffect(() => {
+    let interval;
+    if (orderStatus === 'Preparing') {
+      interval = setInterval(() => { setCookingProgress(p => (p >= 100 ? 100 : p + 1.8)); }, 50);
+    } else setCookingProgress(0);
+    return () => clearInterval(interval);
+  }, [orderStatus]);
+
+  const filteredItems = useMemo(() => menu.filter(i => 
+    i.name.en.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    i.name.pu.includes(searchQuery)
+  ), [searchQuery, menu]);
+
+  const subtotal = cart.reduce((acc, i) => acc + i.price, 0) + 
+                   addonsData.reduce((acc, ad) => acc + (ad.price * (addons[ad.id] || 0)), 0);
+
+  const processOrder = (method) => {
+    if (!isKitchenOpen && !isAdmin) return;
     haptic();
-    setTimeout(() => setOrderStatus('PREPARING'), 2000);
-    setTimeout(() => setOrderStatus('OUT_FOR_DELIVERY'), 5000);
+    setOrderStatus('Preparing');
+    const itemsStr = cart.map(i => `• ${i.name[lang]} (${i.spice})`).join('\n');
+    const adsStr = addonsData.filter(a => addons[a.id]).map(a => `• ${a.name[lang]} x ${addons[a.id]}`).join('\n');
+    const msg = `*THE FLAVOUR'S TOWN*\nOrder ID: ${sessionOrderId}\n\n*Items:*\n${itemsStr}\n\n${adsStr ? `*Addons:*\n${adsStr}\n` : ''}*Total:* ₹${subtotal}\n*Ready In:* ${prepTime}m`;
+
     setTimeout(() => {
-      const msg = `*ZOMATO STYLE ORDER: ${sessionOrderId}*%0A%0AItems: ${cart.map(i => i.name.en).join(', ')}%0A%0ATotal Bill: ₹${grandTotal.toFixed(0)}`;
-      window.open(`https://api.whatsapp.com/send?phone=919877474778&text=${msg}`, '_blank');
-      setCart([]); setView('HOME'); setOrderStatus(null);
-    }, 7000);
+      setOrderStatus(null);
+      if (method === 'WA') window.location.assign(`https://api.whatsapp.com/send?phone=919877474778&text=${encodeURIComponent(msg)}`);
+      else window.location.assign(`upi://pay?pa=9877474778@paytm&pn=FlavoursTown&am=${subtotal}&cu=INR`);
+      setCart([]); setAddons({}); setView('HOME');
+    }, 3500);
   };
 
   return (
-    <div className={`${isDark ? 'bg-[#0a0a0b] text-white' : 'bg-[#f3f4f6] text-black'} min-h-screen transition-all font-sans pb-40`}>
+    <div className={`${isDark ? 'bg-black text-white' : 'bg-[#f8f8fa] text-black'} min-h-screen pb-44 transition-all duration-500 font-sans overflow-x-hidden`}>
       <Head>
-        <title>Flavour's Town Pro | Blinkit Edition</title>
+        <title>{view === 'HOME' ? 'The Flavour\'s Town | Menu' : 'Final Checkout | Bill'}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
       </Head>
 
-      {/* HEADER: SWIGGY/BLINKIT STYLE */}
-      <header className={`fixed top-0 w-full z-[1000] px-6 py-4 backdrop-blur-3xl border-b ${isDark ? 'bg-black/80 border-white/5' : 'bg-white/90 border-gray-200 shadow-sm'} flex justify-between items-center`}>
-        <div className="flex items-center gap-3">
-          <div className="bg-[#ff3269] h-11 w-11 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg">FT</div>
-          <div>
-            <h1 className="text-[14px] font-black uppercase tracking-tight leading-none">The Flavour's Town</h1>
-            <p className="text-[10px] font-bold text-[#ff3269] mt-1 tracking-widest uppercase">Delivery in 15 Mins</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-           <button onClick={() => setIsAiOpen(true)} className="bg-orange-500/10 text-orange-500 px-4 py-2 rounded-xl text-[10px] font-black border border-orange-500/20">🤖 AI</button>
-           <button onClick={() => setIsDark(!isDark)} className="p-3 rounded-xl bg-zinc-800 text-white">{isDark ? '☀️' : '🌙'}</button>
-        </div>
-      </header>
-
-      {view === 'HOME' ? (
-        <main className="pt-28 px-4 max-w-7xl mx-auto space-y-12">
-          {/* CATEGORY TABS: BLINKIT STYLE */}
-          <div className="flex gap-4 overflow-x-auto no-scrollbar py-2">
-            {["Chaap", "Tikka", "Rolls", "Snacks"].map(c => (
-              <button key={c} className="bg-zinc-900 border border-white/5 px-6 py-3 rounded-2xl text-[11px] font-black uppercase whitespace-nowrap">{c}</button>
-            ))}
-          </div>
-
-          {/* PRODUCT GRID: BLINKIT CARD STYLE */}
-          {["Chaap", "Tikka", "Rolls", "Snacks"].map(cat => (
-            <div key={cat} className="space-y-6">
-              <h2 className="text-2xl font-black italic text-gray-400 uppercase tracking-tighter ml-2">{cat}</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {initialMenuData.filter(i => i.category === cat).map(p => (
-                  <div key={p.id} className={`${isDark ? 'bg-zinc-900/50 border-white/5 shadow-2xl' : 'bg-white shadow-md border-gray-100'} p-3 rounded-[2rem] border relative group`}>
-                    <div className="h-44 rounded-[1.5rem] overflow-hidden mb-4 bg-zinc-800 relative">
-                       <img src={p.img} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" alt="" />
-                       <div className="absolute top-3 left-3 bg-[#ff3269] text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase">Bestseller</div>
-                    </div>
-                    <div className="px-1">
-                      <h3 className="text-xs font-black uppercase truncate mb-1">{p.name[lang]}</h3>
-                      <p className="text-[9px] text-gray-500 mb-4 h-6 overflow-hidden leading-tight font-medium">{p.desc}</p>
-                      <div className="flex justify-between items-center bg-black/20 p-2 rounded-2xl">
-                         <span className="text-lg font-black text-orange-500 italic">₹{p.price}</span>
-                         <button onClick={() => { haptic(); setCart([...cart, p]); }} className="bg-white text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-[#ff3269] hover:text-white transition-all">Add</button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      {/* --- RENDER HOME VIEW --- */}
+      {view === 'HOME' && (
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
+          {/* HEADER */}
+          <header className={`fixed top-0 w-full z-[1000] px-4 py-4 backdrop-blur-3xl ${isDark ? 'bg-black/90 border-white/10' : 'bg-white shadow-lg'} border-b flex justify-between items-center`}>
+            <div className="flex items-center gap-3">
+              <div className="bg-orange-600 h-10 w-10 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">FT</div>
+              <div className="flex flex-col leading-none">
+                <h1 className="text-[13px] font-black uppercase italic">The Flavour's Town</h1>
+                <span className="text-[10px] font-bold text-orange-500 animate-pulse drop-shadow-[0_0_8px_orange]">98774-74778</span>
               </div>
             </div>
-          ))}
+            <div className="flex gap-2">
+              <button onClick={() => { haptic(); setIsDark(!isDark); }} className="p-2.5 rounded-xl bg-zinc-800 text-white shadow-inner"> {isDark ? '☀️' : '🌙'} </button>
+              <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[10px] font-black bg-orange-600 text-white px-4 rounded-xl uppercase shadow-lg shadow-orange-600/20">{lang==='pu'?'EN':'ਪੰ'}</button>
+              <button onClick={() => { const p = prompt("Admin:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className="w-10 h-10 rounded-xl bg-[#fdfbf7] border-2 border-orange-200 flex items-center justify-center text-orange-600 shadow-md">⚙️</button>
+            </div>
+          </header>
 
-          {/* FLOATING CART: ZOMATO STYLE */}
+          {/* CATEGORY NAV */}
+          <nav className={`fixed top-[74px] w-full z-[900] py-3 backdrop-blur-md overflow-x-auto no-scrollbar flex gap-2.5 px-4 border-b ${isDark ? 'bg-black/80 border-white/5' : 'bg-white shadow-md'}`}>
+            {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
+              <button key={cat} onClick={() => { haptic(); scrollRefs.current[cat]?.scrollIntoView({behavior:'smooth', block:'start'}); }} className={`px-6 py-2 rounded-full text-[11px] font-black uppercase whitespace-nowrap transition-all border ${isDark ? 'bg-orange-600/10 text-orange-400 border-orange-600/20' : 'bg-white text-orange-600 border-orange-100 shadow-sm'}`}>#{cat}</button>
+            ))}
+          </nav>
+
+          {/* SEARCH */}
+          <section className="pt-36 px-4 max-w-xl mx-auto">
+            <div className={`flex items-center px-6 py-4 rounded-3xl border-2 transition-all shadow-2xl ${isDark ? 'bg-zinc-900 border-white/5' : 'bg-white border-orange-100'}`}>
+               <span className="mr-3 opacity-30 text-xl font-black italic">🔍</span>
+               <input type="text" placeholder={lang === 'pu' ? "ਤੁਸੀਂ ਅੱਜ ਕੀ ਖਾਣਾ ਚਾਹੋਗੇ?..." : "Search malout's elite taste..."} className={`bg-transparent border-none outline-none w-full text-sm font-bold uppercase ${isDark ? 'text-white' : 'text-black'}`} onChange={(e) => setSearchQuery(e.target.value)} />
+            </div>
+          </section>
+
+          {/* MENU GRID */}
+          <main className="mt-10 px-4 max-w-7xl mx-auto space-y-16 pb-48">
+            {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map((catName) => {
+              const items = filteredItems.filter(i => i.category === catName);
+              if (items.length === 0) return null;
+              return (
+                <div key={catName} ref={el => scrollRefs.current[catName] = el} className="space-y-6 scroll-mt-44">
+                  <div className="flex justify-between items-end px-2 border-b border-orange-600/10 pb-2">
+                    <h2 className={`text-3xl font-black italic uppercase tracking-tighter ${isDark ? 'text-white' : 'text-black'}`}>{catName}</h2>
+                    <span className="text-[9px] font-bold opacity-30 uppercase tracking-[0.4em] italic">Original Taste</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
+                    {items.map((p) => (
+                      <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} key={p.id} className={`${isDark ? 'bg-zinc-900/80 border-white/10 shadow-2xl' : 'bg-white border-orange-100 shadow-lg'} rounded-[2.5rem] p-3 border relative group overflow-hidden transition-all ${!p.inStock ? 'grayscale opacity-30' : ''}`}>
+                        {isAdmin && (
+                            <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-orange-600 rounded-[2.5rem]">
+                                <span className="text-3xl mb-1">{p.inStock ? '✅' : '❌'}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">STOCK {p.inStock ? 'IN' : 'OUT'}</span>
+                            </button>
+                        )}
+                        <div className="relative rounded-3xl overflow-hidden mb-3.5 h-36 bg-zinc-800 shadow-lg">
+                          <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 duration-700" alt="" />
+                          <div className="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded-lg text-[8px] font-black text-yellow-400">⭐ {p.rating}</div>
+                        </div>
+                        <div className="text-center px-1">
+                          <h3 className={`text-[12px] font-black uppercase mb-1 h-10 flex items-center justify-center leading-none tracking-tighter italic ${isDark ? 'text-white' : 'text-black'}`}>{p.name[lang]}</h3>
+                          <div className="flex items-center justify-between mt-2 bg-orange-600/5 p-1.5 rounded-2xl border border-orange-600/10">
+                            <p className="text-orange-500 font-black text-lg ml-1 italic tracking-tighter">₹{p.price}</p>
+                            <button disabled={!isKitchenOpen || !p.inStock} onClick={() => { haptic(); setShowCustomizer(p); }} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg ${isKitchenOpen && p.inStock ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-gray-500'}`}>ADD</button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </main>
+
+          {/* FLOATING CART BAR */}
           <AnimatePresence>
             {subtotal > 0 && (
-              <motion.div initial={{y:100}} animate={{y:0}} className="fixed bottom-10 left-0 right-0 z-[1000] px-6">
-                 <button onClick={() => setView('CHECKOUT')} className="w-full max-w-lg mx-auto bg-[#ff3269] p-5 rounded-[2rem] shadow-[0_30px_60px_rgba(255,50,105,0.4)] flex justify-between items-center text-white border-b-4 border-black/20">
-                    <div className="flex items-center gap-4 ml-2">
-                       <div className="text-left leading-none">
-                          <p className="text-[10px] font-black uppercase opacity-60 mb-1">{cart.length} ITEM{cart.length > 1 ? 'S' : ''}</p>
-                          <p className="text-2xl font-black italic">₹{grandTotal.toFixed(0)}</p>
-                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 font-black text-xs uppercase italic tracking-widest bg-black/10 px-6 py-3 rounded-xl">View Cart →</div>
-                 </button>
+              <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-8 left-0 right-0 z-[1000] px-6">
+                <button onClick={() => { haptic(); setView('CHECKOUT'); }} className={`w-full max-w-lg mx-auto p-5 rounded-[2.5rem] shadow-[0_30px_70px_rgba(234,88,12,0.8)] flex justify-between items-center ring-8 ring-orange-600/10 active:scale-95 transition-all border-2 border-orange-600/20 ${isDark ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
+                   <div className="flex items-center gap-4 italic ml-3">
+                      <div className="bg-orange-600 h-11 w-11 rounded-2xl flex items-center justify-center text-2xl shadow-lg text-white font-black animate-bounce">🛒</div>
+                      <div className="text-left leading-none">
+                        <p className={`text-[10px] font-black uppercase opacity-40 mb-1`}>{cart.length} Items</p>
+                        <p className="text-3xl font-black tracking-tighter italic leading-none">₹{subtotal}</p>
+                      </div>
+                   </div>
+                   <div className={`px-10 py-4 rounded-3xl font-black text-[11px] uppercase shadow-2xl italic tracking-widest ${isDark ? 'bg-gray-900 text-white' : 'bg-orange-600 text-white'}`}>Continue →</div>
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
-        </main>
-      ) : (
-        /* --- THE PRO BILLING UI: ZOMATO/SWIGGY STYLE --- */
-        <motion.div initial={{x:400}} animate={{x:0}} className="min-h-screen pt-24 px-6 pb-48 max-w-3xl mx-auto">
-           <button onClick={() => setView('HOME')} className="mb-8 text-xs font-black uppercase text-gray-500 tracking-widest">← Back to Menu</button>
-           
-           <div className="space-y-6">
-              {/* ITEM LIST */}
-              <div className={`${isDark ? 'bg-zinc-900/50 border-white/5' : 'bg-white shadow-xl border-gray-100'} p-8 rounded-[3rem] border`}>
-                 <h2 className="text-xl font-black uppercase italic text-[#ff3269] mb-8">Order Summary</h2>
-                 <div className="space-y-6">
-                    {cart.map((c, i) => (
-                      <div key={i} className="flex justify-between items-center border-b border-white/5 pb-4">
-                        <div className="flex items-center gap-4">
-                           <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                           <p className="font-black text-sm uppercase italic">{c.name[lang]}</p>
-                        </div>
-                        <p className="font-black text-orange-500">₹{c.price}</p>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              {/* BILL BREAKDOWN: PRO STYLE */}
-              <div className={`${isDark ? 'bg-zinc-900/50 border-white/5' : 'bg-white shadow-xl border-gray-100'} p-8 rounded-[3rem] border space-y-4`}>
-                 <h3 className="text-xs font-black uppercase opacity-40 tracking-widest mb-4">Bill Details</h3>
-                 <div className="flex justify-between text-xs font-bold uppercase italic opacity-60">
-                    <span>Item Total</span>
-                    <span>₹{subtotal}</span>
-                 </div>
-                 <div className="flex justify-between text-xs font-bold uppercase italic text-blue-500">
-                    <span>Delivery Fee (Malout Local)</span>
-                    <span>₹{deliveryFee}</span>
-                 </div>
-                 <div className="flex justify-between text-xs font-bold uppercase italic opacity-60">
-                    <span>GST & Restaurant Charges</span>
-                    <span>₹{taxes.toFixed(0)}</span>
-                 </div>
-                 <div className="border-t border-white/5 pt-6 flex justify-between items-end">
-                    <span className="text-sm font-black uppercase italic text-[#ff3269]">Total Amount</span>
-                    <span className="text-5xl font-black italic tracking-tighter text-orange-500">₹{grandTotal.toFixed(0)}</span>
-                 </div>
-              </div>
-
-              {/* PAYMENT CALL TO ACTION */}
-              <div className="pt-10 space-y-4">
-                 <p className="text-[10px] text-center font-bold uppercase text-gray-600 tracking-[0.4em] mb-4 italic">Ordering for Aashray Narang</p>
-                 <button onClick={runOrderFlow} className="w-full bg-[#1A73E8] text-white py-10 rounded-[3.5rem] font-black uppercase text-xs italic shadow-2xl border-b-8 border-black/20 tracking-widest active:scale-95 transition-all">Pay with UPI / GPay</button>
-                 <button onClick={runOrderFlow} className="w-full bg-[#25D366] text-white py-10 rounded-[3.5rem] font-black uppercase text-xs italic shadow-2xl border-b-8 border-black/20 tracking-widest active:scale-95 transition-all">Order on WhatsApp</button>
-              </div>
-           </div>
         </motion.div>
       )}
 
-      {/* --- LIVE STATUS OVERLAY: REAL BLINKIT FEEL --- */}
+      {/* --- RENDER FULL PAGE CHECKOUT VIEW --- */}
+      {view === 'CHECKOUT' && (
+        <motion.div initial={{x: 300, opacity: 0}} animate={{x: 0, opacity: 1}} exit={{x: -300, opacity: 0}} className="min-h-screen px-4 pt-10 pb-20 max-w-2xl mx-auto">
+          {/* TOP BACK BAR */}
+          <div className="flex justify-between items-center mb-10 px-2">
+             <button onClick={() => { haptic(); setView('HOME'); }} className="bg-orange-600/10 text-orange-600 p-4 rounded-3xl font-black text-xs uppercase shadow-sm">← Back To Menu</button>
+             <h2 className="text-xl font-black uppercase italic tracking-tighter underline decoration-orange-600/30 underline-offset-8">Final Checkout</h2>
+          </div>
+
+          {/* THE RECEIPT (PAPER STYLE) */}
+          
+          <div className={`${isDark ? 'bg-white/5 border-white/5' : 'bg-white shadow-2xl border-orange-100'} p-8 rounded-[4rem] mb-10 border-4 border-dashed relative overflow-hidden`}>
+             <div className="absolute top-0 left-0 w-full h-2 bg-orange-600 opacity-20"></div>
+             <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.6em] mb-10 text-center italic opacity-40">Tax Invoice Receipt</p>
+             
+             <div className="space-y-8 font-black mb-14">
+                {cart.map((c, i) => (
+                  <div key={i} className="flex justify-between items-start border-b border-orange-600/10 pb-6 transition-all group">
+                     <div className="text-left leading-none">
+                       <p className={`text-xl font-black uppercase italic ${isDark ? 'text-white' : 'text-black'}`}>{c.name[lang]}</p>
+                       <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-2">{c.spice} Style Preparation</p>
+                     </div>
+                     <div className="text-right">
+                        <p className="text-orange-500 font-black text-2xl italic tracking-tighter leading-none">₹{c.price}</p>
+                        <button onClick={() => { haptic(); setCart(cart.filter((_, idx)=> idx !== i)); }} className="text-[9px] text-red-500 uppercase font-black mt-2 underline">Remove</button>
+                     </div>
+                  </div>
+                ))}
+                
+                {addonsData.map(ad => addons[ad.id] > 0 && (
+                  <div key={ad.id} className="flex justify-between items-center border-b border-orange-600/5 pb-4 opacity-70 italic">
+                     <p className="text-lg uppercase tracking-tighter">{ad.name[lang]} (Quantity x{addons[ad.id]})</p>
+                     <p className="text-orange-500 font-black text-xl italic tracking-tighter">₹{ad.price * addons[ad.id]}</p>
+                  </div>
+                ))}
+             </div>
+
+             {/* GRAND TOTAL */}
+             <div className="flex justify-between items-end border-t-8 border-orange-600 pt-10 px-2 italic font-black">
+                <div className="space-y-2">
+                   <p className="text-xs font-black uppercase opacity-40 tracking-[0.4em]">Sub-Total Value</p>
+                   <p className="text-8xl font-black text-orange-600 tracking-tighter leading-none">₹{subtotal}</p>
+                </div>
+                <div className="text-right">
+                   <p className="text-[9px] font-black uppercase opacity-20 mb-1">Time To Prep</p>
+                   <p className="text-xl opacity-60">⏱️ {prepTime} Mins</p>
+                </div>
+             </div>
+          </div>
+
+          {/* ADDONS SELECTION (BETTER UI) */}
+          <div className="mb-14">
+             <p className="text-[11px] font-black uppercase text-orange-500 tracking-[0.5em] mb-6 ml-4 italic underline decoration-orange-600/10">Add Extra Swaad:</p>
+             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-2">
+                {addonsData.map(a => (
+                  <div key={a.id} className={`${isDark ? 'bg-zinc-900 border-white/5' : 'bg-white border-orange-50 shadow-xl'} min-w-[180px] p-8 rounded-[4rem] border-2 text-center transition-all`}>
+                     <p className="text-base font-black mb-1 uppercase tracking-tighter text-orange-600">{a.name[lang]}</p>
+                     <p className={`text-lg font-black mb-8 italic ${isDark ? 'text-white' : 'text-gray-900'}`}>₹{a.price}</p>
+                     <div className={`flex justify-between items-center ${isDark ? 'bg-black/90' : 'bg-gray-100'} rounded-[3rem] p-3 border-2 border-orange-600/10`}>
+                        <button onClick={() => { haptic(); setAddons({...addons, [a.id]: Math.max(0, (addons[a.id] || 0) - 1)}); }} className="w-10 h-10 text-orange-600 font-black text-5xl flex items-center justify-center leading-none">-</button>
+                        <span className={`text-xl font-black ${isDark ? 'text-white' : 'text-black'}`}>{addons[a.id] || 0}</span>
+                        <button onClick={() => { haptic(); setAddons({...addons, [a.id]: (addons[a.id] || 0) + 1}); }} className="w-10 h-10 text-orange-600 font-black text-5xl flex items-center justify-center leading-none">+</button>
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </div>
+
+          {/* PAYMENT OPTIONS (GIANT BUTTONS) */}
+          <div className="space-y-6 px-2 pb-20">
+             <button onClick={() => processOrder('UPI')} className="w-full bg-[#1A73E8] text-white py-10 rounded-[4rem] font-black uppercase shadow-[0_20px_50px_rgba(26,115,232,0.4)] tracking-[0.4em] text-xs italic active:scale-95 transition-all border-4 border-white/10 flex items-center justify-center gap-6">
+                <span className="text-3xl">💳</span> UPI PAYMENT GATEWAY
+             </button>
+             <button onClick={() => processOrder('WA')} className="w-full bg-[#25D366] text-white py-10 rounded-[4rem] font-black uppercase shadow-[0_20px_50px_rgba(37,211,102,0.4)] tracking-[0.4em] text-xs italic active:scale-95 transition-all border-4 border-white/10 flex items-center justify-center gap-6">
+                <span className="text-3xl">📱</span> CONFIRM WHATSAPP BILL
+             </button>
+             <p className="text-center text-[9px] font-black uppercase opacity-20 tracking-[0.3em] italic">Official Shop ID: {sessionOrderId}</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* FOOTER */}
+      <footer className={`mt-40 px-6 py-32 ${isDark ? 'bg-zinc-950 border-t border-white/5' : 'bg-white border-t border-orange-50'} text-center overflow-hidden relative shadow-2xl`}>
+        <div className="mb-12 flex flex-col items-center gap-3 opacity-30">
+            <div className="w-12 h-12 border-4 border-green-600 rounded-2xl flex items-center justify-center p-1 shadow-[0_0_20px_green]">
+                <div className="w-full h-full bg-green-600 rounded-full"></div>
+            </div>
+            <p className="text-[10px] font-black text-green-600 tracking-widest italic leading-none uppercase">100% PURE VEG MALOUT</p>
+        </div>
+        <p className="text-[9px] font-black uppercase tracking-[0.6em] text-gray-700 mb-8 opacity-30 italic leading-none underline decoration-orange-600/20 underline-offset-8">Designed & Coded For High Swaad By</p>
+        <h2 className="text-4xl font-black italic uppercase mb-16 transition-all hover:scale-110 duration-700">
+          <span className={isDark ? 'text-white' : 'text-black'}>developed by </span> 
+          <span className="text-orange-600 italic tracking-tighter">aashray narang</span>
+        </h2>
+        <div className="flex justify-center gap-10 mb-16 z-20 relative opacity-40 hover:opacity-100 transition-all scale-110">
+          <a href="https://github.com/Object2005" target="_blank" className="hover:scale-150 transition-all hover:drop-shadow-[0_0_8px_orange]"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" className={`w-9 h-9 ${isDark ? 'invert' : ''}`} alt="Git" /></a>
+          <a href="https://linkedin.com/in/aashray-narang" target="_blank" className="hover:scale-150 transition-all hover:drop-shadow-[0_0_8px_orange]"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" className="w-9 h-9" alt="LinkedIn" /></a>
+          <a href="mailto:aashraynarang@gmail.com" className="hover:scale-150 transition-all hover:drop-shadow-[0_0_8px_orange]"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" className="w-9 h-9" alt="Mail" /></a>
+        </div>
+        <div className="opacity-10 font-black italic text-xs uppercase tracking-widest">Malout, Punjab ● © 2026</div>
+      </footer>
+
+      {/* ITEM CUSTOMIZER (POPS OVER HOME) */}
       <AnimatePresence>
-        {orderStatus && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/95 z-[5000] flex flex-col items-center justify-center p-12 text-center backdrop-blur-xl">
-             <div className="text-[10rem] mb-12 animate-pulse">
-                {orderStatus === 'CONFIRMING' ? '📋' : orderStatus === 'PREPARING' ? '🥘' : '🚴'}
-             </div>
-             <h2 className="text-6xl font-black italic uppercase text-[#ff3269] mb-4 tracking-tighter">
-                {orderStatus === 'CONFIRMING' ? 'Confirming Order' : orderStatus === 'PREPARING' ? 'In the Kitchen' : 'Out for Delivery'}
-             </h2>
-             <p className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.5em] italic">Malout Express Delivery Active</p>
-             <div className="w-full max-w-xl h-2 bg-zinc-900 rounded-full mt-10 overflow-hidden">
-                <motion.div initial={{width:0}} animate={{width:'100%'}} transition={{duration:7}} className="h-full bg-[#ff3269] shadow-[0_0_20px_#ff3269]"></motion.div>
-             </div>
+        {showCustomizer && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/99 backdrop-blur-[100px] z-[3000] flex items-end justify-center p-6">
+            <motion.div initial={{y:1000}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950' : 'bg-white shadow-[0_-100px_300px_rgba(0,0,0,1)]'} w-full rounded-[6rem] p-16 max-w-2xl border-t-[15px] border-orange-600/30 relative`}>
+              <button onClick={() => setShowCustomizer(null)} className="absolute top-14 right-14 text-gray-500 font-black text-4xl hover:text-red-500 transition-colors">✕</button>
+              <h2 className="text-[90px] font-black italic uppercase text-orange-600 mb-8 tracking-tighter leading-[0.7] underline decoration-white/5 underline-offset-[20px]">{showCustomizer.name[lang]}</h2>
+              <p className="text-[12px] font-black opacity-30 mb-14 tracking-[0.5em] uppercase italic text-center leading-none">Flavor Profile Setting</p>
+              <div className="space-y-20 mb-28">
+                <div className="flex gap-6">
+                  {['Low', 'Medium', 'High'].map(spice => (
+                    <button key={spice} onClick={() => { haptic(); setCustomOptions({spice}); }} className={`flex-1 py-11 rounded-[4rem] text-[18px] font-black border-[6px] transition-all shadow-xl ${customOptions.spice === spice ? 'bg-orange-600 border-orange-600 text-white scale-105 shadow-orange-600/40' : 'border-zinc-800 text-gray-600 opacity-20'}`}>{spice}</button>
+                  ))}
+                </div>
+              </div>
+              <button onClick={() => { haptic(); setCart([...cart, {...showCustomizer, ...customOptions}]); setShowCustomizer(null); }} className="w-full bg-orange-600 text-white py-10 rounded-[5rem] font-black uppercase shadow-[0_50px_120px_rgba(234,88,12,0.8)] text-2xl active:scale-95 transition-all mb-8 italic tracking-[0.2em] border-t-8 border-white/10">Confirm & Add Item</button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* FOOTER: DEVELOPER BRANDING */}
-      <footer className="mt-40 px-10 py-32 bg-zinc-950 border-t border-white/5 text-center">
-        <h2 className="text-5xl font-black italic uppercase mb-12 tracking-tighter leading-tight transition-all hover:scale-105">
-           <span className="opacity-40">built by</span> <br/>
-           <span className="text-orange-600">aashray narang</span>
-        </h2>
-        <div className="flex justify-center gap-12 opacity-30 hover:opacity-100 transition-all scale-125">
-           <a href="https://github.com/Object2005" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" className="w-11 h-11 invert" alt="" /></a>
-           <a href="https://linkedin.com/in/aashray-narang" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" className="w-11 h-11" alt="" /></a>
-        </div>
-      </footer>
+
+      {/* COOKING ENGINE OVERLAY */}
+      <AnimatePresence>
+        {orderStatus && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/99 z-[5000] flex flex-col items-center justify-center p-20 backdrop-blur-[100px] overflow-hidden text-center">
+             <motion.div animate={{ scale:[1, 1.3, 1], rotate:[0, 20, -20, 0] }} transition={{repeat:Infinity, duration:2.2}} className="text-[14rem] mb-16 drop-shadow-[0_0_100px_rgba(234,88,12,0.9)]">🥘</motion.div>
+             <h2 className="text-8xl font-black italic uppercase tracking-tighter mb-10 text-orange-600 underline decoration-white/10 underline-offset-[25px] decoration-[12px]">Cooking!</h2>
+             <p className="text-lg text-gray-500 mb-24 uppercase tracking-[0.7em] font-black max-w-2xl leading-loose italic opacity-60">Master Chef is currently crafting Malout's legendary veg cuisine...</p>
+             <div className="w-[35rem] h-4 bg-zinc-900 rounded-full overflow-hidden border border-white/10 relative shadow-[0_0_60px_rgba(0,0,0,1)] ring-[15px] ring-orange-600/5">
+                <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-gradient-to-r from-orange-500 to-red-600 shadow-[0_0_120px_rgba(234,88,12,1)] rounded-full"></motion.div>
+             </div>
+             <p className="text-[14px] font-black uppercase tracking-[1.2em] text-orange-600 animate-pulse italic mt-10">Syncing Secure Order Intel...</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
