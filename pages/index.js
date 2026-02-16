@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIG ---
 const ADMIN_PASS = "aashray778";
-const UPI_ID = "9877474778@paytm"; // Tera UPI ID (Direct Payment Layi)
+const UPI_ID = "NARANGAASHRAY98-2@OKICICI"; // Tera UPI ID (Direct Payment Layi)
 
 // --- MENU DATA (LOCAL IMAGES) ---
 const initialMenuData = [
