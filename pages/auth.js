@@ -19,7 +19,7 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-export default function GoogleAuthPage() {
+export default function AuthPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,7 @@ export default function GoogleAuthPage() {
     if (localStorage.getItem('ft_user')) router.push('/');
   }, [router]);
 
-  const loginWithGoogle = async () => {
+  const handleGoogleLogin = async () => {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
@@ -37,13 +37,14 @@ export default function GoogleAuthPage() {
         name: user.displayName,
         email: user.email,
         photo: user.photoURL,
-        uid: user.uid
+        uid: user.uid,
+        loginType: 'google'
       };
 
       localStorage.setItem('ft_user', JSON.stringify(userData));
       router.push('/');
     } catch (error) {
-      console.error(error);
+      console.error("Login Error:", error);
       alert("Login Failed: " + error.message);
     }
     setLoading(false);
@@ -59,23 +60,19 @@ export default function GoogleAuthPage() {
         className="w-full max-w-sm bg-white p-12 rounded-[4rem] shadow-2xl text-center border border-gray-100"
       >
         <h1 className="text-3xl font-black italic text-orange-600 uppercase tracking-tighter mb-2">The Flavours Town</h1>
-        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] mb-12">Premium Food Experience</p>
-
-        <div className="mb-12">
-            <div className="w-24 h-24 bg-orange-50 rounded-[2.5rem] mx-auto flex items-center justify-center text-4xl shadow-inner">🍔</div>
-        </div>
+        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] mb-12">Login to your food kingdom</p>
 
         <button 
-          onClick={loginWithGoogle}
+          onClick={handleGoogleLogin}
           disabled={loading}
           className="w-full py-5 bg-white border-2 border-gray-100 hover:border-orange-600 rounded-[2rem] flex items-center justify-center gap-4 transition-all active:scale-95 shadow-sm"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-6 h-6" alt="Google" />
-          <span className="font-black text-sm uppercase tracking-widest">{loading ? 'Connecting...' : 'Continue with Google'}</span>
+          <span className="font-black text-sm uppercase tracking-widest">{loading ? 'Logging in...' : 'Sign in with Google'}</span>
         </button>
 
         <p className="mt-10 text-[8px] font-black opacity-20 uppercase tracking-widest leading-loose">
-          By continuing, you enter the town of flavors.<br/>Developed by Aashray Narang
+          No OTP, No Captcha, Just Flavor.<br/>Powered by Aashray Narang
         </p>
       </motion.div>
     </div>
