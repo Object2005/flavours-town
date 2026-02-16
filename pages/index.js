@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set, update } from "firebase/database";
+import { getDatabase, ref, onValue, set, update, remove } from "firebase/database";
 
-// --- FIREBASE CONFIG (Teri apni config) ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo",
   authDomain: "flavourstown-83891.firebaseapp.com",
@@ -18,101 +18,124 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const ADMIN_PASS = "aashray778";
+const OWNER_CONTACT = "+91 9877474778"; // Tera Number
 
 export default function Home() {
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [liveOrders, setLiveOrders] = useState([]);
+  const [userOrder, setUserOrder] = useState(null);
   const [userDetails, setUserDetails] = useState({ name: '', phone: '', type: 'Takeaway' });
-  const [lang, setLang] = useState('pu');
+  const [isDark, setIsDark] = useState(true);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [lang, setLang] = useState('pu');
 
-  useEffect(() => {
-    onValue(ref(db, 'menu'), (snap) => snap.val() && setMenu(snap.val()));
-    onValue(ref(db, 'orders'), (snap) => {
-      const data = snap.val();
-      if (data) setLiveOrders(Object.keys(data).map(k => ({...data[k], firebaseKey: k})));
-    });
-  }, []);
-
-  // --- 📊 ANALYTICS LOGIC (THE BRAIN) ---
-  const getAnalytics = () => {
-    const stats = { totalSales: 0, itemsCount: {}, peakHour: 'N/A' };
-    const hours = Array(24).fill(0);
-
-    liveOrders.forEach(order => {
-      stats.totalSales += order.total;
-      // Item frequency
-      order.items.forEach(item => {
-        stats.itemsCount[item.name.en] = (stats.itemsCount[item.name.en] || 0) + 1;
-      });
-      // Time tracking
-      const hour = new Date(order.timestamp).getHours();
-      hours[hour]++;
-    });
-
-    const bestSeller = Object.entries(stats.itemsCount).sort((a,b) => b[1] - a[1])[0];
-    const peakHour = hours.indexOf(Math.max(...hours));
-
-    return { 
-      sales: stats.totalSales, 
-      best: bestSeller ? bestSeller[0] : 'N/A', 
-      peak: peakHour ? `${peakHour}:00` : 'N/A' 
-    };
+  // Sounds
+  const playSound = (type) => {
+    const url = type === 'new' ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' : 'https://assets.mixkit.co/active_storage/sfx/1111/1111-preview.mp3';
+    new Audio(url).play().catch(() => {});
   };
 
-  const analytics = getAnalytics();
+  useEffect(() => {
+    // Persistent Login
+    const saved = localStorage.getItem('ft_user');
+    if (saved) setUserDetails(JSON.parse(saved));
 
-  const placeOrder = (method) => {
-    if (!userDetails.name || !userDetails.phone) return alert("Details?");
+    onValue(ref(db, 'menu'), (snap) => snap.val() && setMenu(snap.val()));
+    
+    onValue(ref(db, 'orders'), (snap) => {
+      const data = snap.val();
+      if (data) {
+        const orders = Object.keys(data).map(k => ({...data[k], firebaseKey: k}));
+        
+        // Sound for User on Status Change
+        const myOrder = orders.find(o => o.user.phone === userDetails.phone);
+        if (myOrder && userOrder && myOrder.status !== userOrder.status) playSound('status');
+        
+        setUserOrder(myOrder);
+        setLiveOrders(orders);
+        
+        // Sound for Admin on New Order
+        if (isAdmin && orders.length > liveOrders.length) playSound('new');
+      }
+    });
+  }, [userDetails.phone, isAdmin]);
+
+  const placeOrder = () => {
+    if (!userDetails.name || userDetails.phone.length !== 10) return alert("Sahi Name te 10-digit Phone bharo!");
     const orderId = `FT-${Math.floor(1000 + Math.random() * 9000)}`;
-    set(ref(db, 'orders/' + orderId), {
+    const orderData = {
         id: orderId, user: userDetails, items: cart,
         total: cart.reduce((acc, i) => acc + i.price, 0),
-        status: 'Pending', method, timestamp: new Date().toISOString()
-    });
+        status: 'Pending', timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('ft_user', JSON.stringify(userDetails));
+    set(ref(db, 'orders/' + orderId), orderData);
     setCart([]); setShowCheckout(false);
   };
 
+  const cancelOrder = (key) => { if(confirm("Cancel karda?")) remove(ref(db, `orders/${key}`)); };
+
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans">
-      <header className="fixed top-0 w-full z-[100] px-6 py-4 backdrop-blur-xl border-b border-white/5 flex justify-between items-center">
-        <div className="font-black text-orange-500 tracking-tighter italic">FLAVOURS TOWN</div>
-        <button onClick={() => { const p=prompt("Pass:"); if(p===ADMIN_PASS) setIsAdmin(!isAdmin); }} className="opacity-20 text-xs">⚙️</button>
+    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#050505] text-white' : 'bg-[#f5f5f7] text-black'}`}>
+      <Head><title>Flavour's Town | Siraa UI</title></Head>
+
+      {/* --- PREMIUM NAVBAR --- */}
+      <header className="fixed top-0 w-full z-[100] backdrop-blur-2xl border-b border-white/10 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+            <motion.div animate={{rotate: 360}} transition={{duration: 20, repeat: Infinity}} className="w-8 h-8 bg-gradient-to-tr from-orange-600 to-yellow-400 rounded-full shadow-lg shadow-orange-500/40" />
+            <h1 className="font-black text-lg tracking-tighter uppercase italic text-orange-500">Flavour's Town</h1>
+        </div>
+        <div className="flex gap-4 items-center">
+            <button onClick={() => setIsDark(!isDark)} className="text-lg">{isDark ? '☀️' : '🌙'}</button>
+            <button onClick={() => { const p=prompt("Admin Pass:"); if(p===ADMIN_PASS) setIsAdmin(!isAdmin); }} className="opacity-30">⚙️</button>
+        </div>
       </header>
 
-      <main className="pt-24 pb-32 px-4 max-w-5xl mx-auto">
+      <main className="pt-24 pb-32 px-4 max-w-6xl mx-auto">
+        
+        {/* --- USER DASHBOARD (YOUR ORDER) --- */}
+        {userOrder && !isAdmin && (
+          <motion.div layout initial={{y: 20}} animate={{y: 0}} className="mb-8 p-6 rounded-[2.5rem] bg-orange-600 text-white shadow-2xl shadow-orange-600/30">
+            <div className="flex justify-between items-center mb-4 border-b border-white/20 pb-4">
+                <span className="text-[10px] font-black tracking-widest uppercase">Your Live Order</span>
+                <span className="bg-white text-orange-600 px-4 py-1 rounded-full text-[10px] font-black animate-pulse">{userOrder.status}</span>
+            </div>
+            <div className="space-y-2">
+                {userOrder.items.map((i,idx) => (
+                    <div key={idx} className="flex justify-between text-sm font-bold">
+                        <span>{i.name.en}</span><span>₹{i.price}</span>
+                    </div>
+                ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between font-black text-xl italic">
+                <span>TOTAL BILL</span><span>₹{userOrder.total}</span>
+            </div>
+          </motion.div>
+        )}
+
         {isAdmin ? (
-          <div className="animate-in fade-in space-y-6">
-            {/* --- ANALYTICS DASHBOARD --- */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
-                    <p className="text-[10px] uppercase opacity-40 font-black mb-1">Total Sales</p>
-                    <h2 className="text-2xl font-black text-green-500">₹{analytics.sales}</h2>
-                </div>
-                <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
-                    <p className="text-[10px] uppercase opacity-40 font-black mb-1">Best Seller</p>
-                    <h2 className="text-xl font-black text-orange-500 truncate">{analytics.best}</h2>
-                </div>
-                <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
-                    <p className="text-[10px] uppercase opacity-40 font-black mb-1">Peak Hour</p>
-                    <h2 className="text-2xl font-black text-blue-500">{analytics.peak}</h2>
+          /* --- ADVANCED ADMIN PANEL --- */
+          <div className="space-y-6">
+            <div className="flex justify-between items-center px-2">
+                <h2 className="text-2xl font-black italic">COMMAND CENTER</h2>
+                <div className="text-right">
+                    <p className="text-[10px] opacity-40 font-bold uppercase">Total Earnings</p>
+                    <p className="text-xl font-black text-green-500">₹{liveOrders.reduce((a,b)=>a+b.total,0)}</p>
                 </div>
             </div>
-
-            <div className="space-y-3">
-                <h3 className="text-xs font-black uppercase opacity-30 tracking-[0.2em] px-2">Live Orders</h3>
+            
+            <div className="space-y-4">
                 {liveOrders.slice().reverse().map(o => (
-                    <div key={o.id} className="p-5 rounded-[2rem] bg-zinc-900/50 border border-white/5">
-                        <div className="flex justify-between font-bold mb-1">
-                            <span className="text-sm">{o.user.name} <span className="text-[9px] opacity-40 px-2 border border-white/10 rounded-full">{o.user.type}</span></span>
-                            <span className="text-orange-500">₹{o.total}</span>
+                    <div key={o.id} className="p-6 rounded-3xl bg-zinc-900 border border-white/10">
+                        <div className="flex justify-between font-bold text-sm mb-4">
+                            <span>{o.user.name} ({o.user.phone})</span>
+                            <button onClick={() => cancelOrder(o.firebaseKey)} className="text-red-500 text-[10px] font-black uppercase">Cancel X</button>
                         </div>
-                        <p className="text-[10px] opacity-40 mb-4 truncate">{o.items.map(i=>i.name.en).join(', ')}</p>
                         <div className="flex gap-2">
                             {['Pending', 'Cooking', 'Ready'].map(s => (
-                                <button key={s} onClick={() => update(ref(db, `orders/${o.firebaseKey}`), { status: s })} className={`flex-1 py-2 rounded-xl text-[9px] font-black border transition-all ${o.status===s ? 'bg-orange-600 border-orange-600' : 'opacity-20 border-white/10'}`}>{s}</button>
+                                <button key={s} onClick={() => update(ref(db, `orders/${o.firebaseKey}`), {status: s})} className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all ${o.status===s ? 'bg-orange-600 border-orange-600' : 'bg-white/5 opacity-20'}`}>{s}</button>
                             ))}
                         </div>
                     </div>
@@ -120,49 +143,53 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          /* --- USER INTERFACE --- */
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {menu.map(p => (
-              <div key={p.id} className={`rounded-[2.5rem] bg-white/5 border border-white/5 overflow-hidden ${!p.inStock ? 'grayscale opacity-30' : ''}`}>
-                <div className="h-40 overflow-hidden relative">
-                    <img src={p.img} className="w-full h-full object-cover" />
-                    <span className="absolute bottom-3 left-4 font-black text-sm">₹{p.price}</span>
+          /* --- DYNAMIC GRID MENU --- */
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+            {menu.map((p, idx) => (
+              <motion.div key={p.id} whileHover={{y: -5}} className={`relative rounded-[3rem] overflow-hidden border ${isDark ? 'bg-zinc-900 border-white/5' : 'bg-white border-black/5 shadow-xl'} ${!p.inStock ? 'grayscale' : ''}`}>
+                <div className="h-48 overflow-hidden"><img src={p.img} className="w-full h-full object-cover" /></div>
+                <div className="p-5 text-center">
+                    <h3 className="font-black text-xs uppercase tracking-tight mb-1">{p.name[lang]}</h3>
+                    <p className="text-orange-500 font-black text-lg mb-4 italic">₹{p.price}</p>
+                    {isAdmin ? (
+                        <button onClick={() => update(ref(db, `menu/${idx}`), {inStock: !p.inStock})} className="w-full py-2 rounded-2xl border border-white/20 text-[10px] font-bold">
+                            {p.inStock ? 'IN STOCK' : 'OUT OF STOCK'}
+                        </button>
+                    ) : (
+                        <button onClick={() => setCart([...cart, p])} disabled={!p.inStock} className="w-full py-4 bg-orange-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-orange-600/20 active:scale-95 transition-transform">Add to Tray</button>
+                    )}
                 </div>
-                <div className="p-4 text-center">
-                  <h3 className="text-[11px] font-black uppercase tracking-tight mb-3">{p.name[lang]}</h3>
-                  <button onClick={() => setCart([...cart, p])} disabled={!p.inStock} className="w-full py-3 bg-white text-black rounded-2xl text-[9px] font-black uppercase active:bg-orange-600 active:text-white transition-all">Add +</button>
-                </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </main>
 
-      <footer className="py-10 border-t border-white/5 text-center opacity-20">
-         <p className="text-[9px] font-black uppercase tracking-[0.3em]">Built for Business by Aashray</p>
+      {/* --- FOOTER --- */}
+      <footer className="py-20 border-t border-white/5 text-center">
+          <p className="text-[10px] font-black opacity-20 uppercase tracking-[0.5em] mb-4">Masterpiece by Aashray Narang</p>
+          <p className="text-[10px] font-bold opacity-60">Owner Support: {OWNER_CONTACT}</p>
       </footer>
 
+      {/* --- CART BUTTON --- */}
       {cart.length > 0 && (
-        <button onClick={() => setShowCheckout(true)} className="fixed bottom-8 left-6 right-6 p-5 bg-orange-600 text-white rounded-3xl font-black flex justify-between items-center shadow-2xl">
-          <span className="text-[10px] font-black uppercase tracking-widest">Review Tray ({cart.length})</span>
-          <span>₹{cart.reduce((acc, i) => acc + i.price, 0)} →</span>
-        </button>
+          <button onClick={() => setShowCheckout(true)} className="fixed bottom-8 left-8 right-8 p-6 bg-white text-black rounded-[2.5rem] font-black flex justify-between items-center shadow-2xl z-[150]">
+              <span className="text-[10px] uppercase">Review Tray ({cart.length})</span>
+              <span className="text-xl italic font-black">₹{cart.reduce((a,b)=>a+b.price,0)} →</span>
+          </button>
       )}
 
-      {/* --- CHECKOUT DRAWER --- */}
+      {/* --- FULLSCREEN CHECKOUT (BLINKIT STYLE) --- */}
       <AnimatePresence>
         {showCheckout && (
-          <motion.div initial={{y: '100%'}} animate={{y: 0}} exit={{y: '100%'}} className="fixed inset-0 z-[200] bg-black p-8 pt-20 flex flex-col">
-            <h2 className="text-4xl font-black italic mb-10 tracking-tighter uppercase">Order Details</h2>
-            <div className="flex gap-2 mb-6">
-                {['Dine-in', 'Takeaway'].map(t => (
-                    <button key={t} onClick={() => setUserDetails({...userDetails, type: t})} className={`flex-1 py-5 rounded-3xl font-black text-[10px] uppercase border transition-all ${userDetails.type === t ? 'border-orange-600 bg-orange-600/10 text-orange-500' : 'border-white/10 opacity-30'}`}>{t}</button>
-                ))}
-            </div>
-            <input placeholder="Name" className="w-full p-5 rounded-2xl bg-white/5 mb-4 font-bold border border-white/10 outline-none focus:border-orange-500" onChange={e => setUserDetails({...userDetails, name: e.target.value})} />
-            <input placeholder="Phone" className="w-full p-5 rounded-2xl bg-white/5 mb-8 font-bold border border-white/10 outline-none focus:border-orange-500" onChange={e => setUserDetails({...userDetails, phone: e.target.value})} />
-            <button onClick={() => placeOrder('COD')} className="w-full py-6 bg-white text-black rounded-[2rem] font-black text-xl mb-4">CONFIRM ORDER</button>
-            <button onClick={() => setShowCheckout(false)} className="py-4 opacity-30 text-[10px] font-black text-center uppercase">Cancel</button>
+          <motion.div initial={{y: '100%'}} animate={{y: 0}} exit={{y: '100%'}} transition={{type: 'spring', damping: 25}} className="fixed inset-0 z-[200] bg-orange-600 p-8 flex flex-col justify-center">
+              <h2 className="text-6xl font-black italic text-white mb-10 tracking-tighter">FINISH <br/> <span className="opacity-40 text-black">ORDER</span></h2>
+              <div className="space-y-4">
+                  <input placeholder="Your Name" value={userDetails.name} onChange={e=>setUserDetails({...userDetails, name: e.target.value})} className="w-full p-6 rounded-3xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 font-black outline-none" />
+                  <input type="number" placeholder="Phone Number (10 digits)" value={userDetails.phone} onChange={e=>setUserDetails({...userDetails, phone: e.target.value})} className="w-full p-6 rounded-3xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 font-black outline-none" />
+              </div>
+              <button onClick={placeOrder} className="w-full mt-8 py-6 bg-white text-orange-600 rounded-[2.5rem] font-black text-2xl shadow-2xl">ORDER NOW</button>
+              <button onClick={() => setShowCheckout(false)} className="mt-6 font-black uppercase text-[10px] opacity-40 text-black tracking-widest text-center">Go Back</button>
           </motion.div>
         )}
       </AnimatePresence>
