@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set, update } from "firebase/database";
+import { getDatabase, ref, onValue, set } from "firebase/database";
 
+// --- CONFIG ---
 const firebaseConfig = { apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", authDomain: "flavourstown-83891.firebaseapp.com", databaseURL: "https://flavourstown-83891-default-rtdb.firebaseio.com", projectId: "flavourstown-83891", storageBucket: "flavourstown-83891.firebasestorage.app", messagingSenderId: "631949771733", appId: "1:631949771733:web:16e025bbc443493242735c" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -15,117 +16,118 @@ export default function Home() {
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
-  const [wallet, setWallet] = useState(0);
-  const [isShopOpen, setIsShopOpen] = useState(true);
-  const [showCheckout, setShowCheckout] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem('ft_user');
-    if (!saved) {
-      router.push('/auth');
-    } else {
-      const u = JSON.parse(saved);
-      setUser(u);
-      
-      // Safe Wallet Fetching
-      const walletRef = ref(db, `wallets/${u.phone}`);
-      onValue(walletRef, (snap) => {
-        if (snap.exists()) setWallet(snap.val().balance || 0);
-      });
-    }
+    if (!saved) router.push('/auth');
+    else setUser(JSON.parse(saved));
 
-    // Safe Menu Fetching
     onValue(ref(db, 'menu'), snap => {
       setMenu(snap.exists() ? snap.val() : []);
       setLoading(false);
     });
-
-    onValue(ref(db, 'shopStatus'), snap => setIsShopOpen(snap.exists() ? snap.val() : true));
   }, [router]);
 
-  const itemTotal = cart.reduce((a, b) => a + (b.price || 0), 0);
-  const cashback = Math.floor(itemTotal * 0.05);
+  const total = cart.reduce((a, b) => a + (b.price || 0), 0);
 
-  const placeOrder = () => {
-    if (!user) return;
-    const orderId = `FT-${Math.floor(1000 + Math.random() * 9000)}`;
-    const orderData = {
-        id: orderId, user, items: cart,
-        total: itemTotal, cashbackEarned: cashback,
-        status: 'Pending', timestamp: new Date().toISOString()
-    };
-
-    set(ref(db, 'orders/' + orderId), orderData);
-    update(ref(db, `wallets/${user.phone}`), { balance: wallet + cashback });
-    
-    setCart([]); setShowCheckout(false);
-    alert(`Order Placed! ₹${cashback} Cashback added.`);
-  };
-
-  // Prevent Crash if user is not loaded yet
-  if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-[#fcfcfc] flex items-center justify-center">
-        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-12 h-12 bg-orange-600 rounded-2xl shadow-xl shadow-orange-500/20" />
-      </div>
-    );
-  }
+  if (loading || !user) return (
+    <div className="min-h-screen bg-[#fcfbf7] flex items-center justify-center">
+      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full" />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] font-sans pb-40 text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#fcfbf7] text-[#1a1a1a] font-sans">
       <Head><title>{APP_NAME}</title></Head>
-      
-      <header className="fixed top-0 w-full z-[150] bg-white/90 backdrop-blur-md border-b px-6 py-4 flex justify-between items-center shadow-sm">
-        <h1 className="font-black italic text-orange-600 text-sm uppercase tracking-tighter">{APP_NAME}</h1>
-        <div className="bg-orange-50 px-3 py-1 rounded-full border border-orange-100 flex items-center gap-1">
-          <span className="text-[10px] font-black text-orange-600">WALLET: ₹{wallet}</span>
+
+      {/* --- FLOATING HEADER --- */}
+      <header className="fixed top-5 left-5 right-5 z-[100] bg-white/80 backdrop-blur-xl border border-white/20 px-6 py-4 flex justify-between items-center rounded-3xl shadow-sm">
+        <h1 className="font-black italic text-orange-600 text-lg uppercase tracking-tighter">
+          {APP_NAME}
+        </h1>
+        <div className="flex items-center gap-2 bg-gray-100/50 px-4 py-2 rounded-full">
+           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+           <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Hi, {user.name.split(' ')[0]}</span>
         </div>
       </header>
 
-      <main className="pt-24 px-4 max-w-4xl mx-auto">
-        {/* COMBOS */}
-        <div className="mb-8">
-          <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] mb-3">Today's Hot Combos 🔥</p>
-          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-            <div className="min-w-[280px] bg-orange-600 p-6 rounded-[2.5rem] text-white shadow-xl">
-                <h3 className="text-xl font-black italic mb-1 uppercase tracking-tighter">Party Combo</h3>
-                <p className="text-[10px] font-bold opacity-80 mb-4 uppercase tracking-tighter">Full Chaap + 2 Roti + Coke</p>
-                <div className="flex justify-between items-end"><span className="text-2xl font-black italic">₹249</span></div>
-            </div>
-          </div>
-        </div>
+      <main className="pt-32 pb-44 px-6 max-w-5xl mx-auto">
+        {/* --- HERO SECTION --- */}
+        <section className="mb-12">
+            <h2 className="text-5xl font-black italic tracking-tighter leading-[0.9] mb-4 text-gray-900 uppercase">
+                Malout’s Most <br/> 
+                <span className="text-orange-600 relative inline-block">
+                  Wanted
+                  <span className="absolute bottom-1 left-0 w-full h-2 bg-orange-600/10 -z-10"></span>
+                </span> Taste.
+            </h2>
+            <p className="text-[11px] font-bold opacity-40 uppercase tracking-[0.2em]">Freshly cooked every single day</p>
+        </section>
 
-        {/* MENU */}
-        <div className="grid grid-cols-2 gap-4">
-          {menu?.length > 0 ? menu.map(p => (
-            <motion.div whileTap={{scale:0.95}} key={p.id} className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
-              <div className="h-40 overflow-hidden"><img src={p.img} className="w-full h-full object-cover" /></div>
-              <div className="p-4 text-center">
-                <h3 className="text-[10px] font-black uppercase mb-1 tracking-tight">{p.name?.en || "Item"}</h3>
-                <p className="text-orange-600 font-black text-sm mb-3 italic">₹{p.price}</p>
-                <button onClick={() => setCart([...cart, p])} className="w-full py-3 bg-[#1a1a1a] text-white rounded-xl text-[9px] font-black uppercase shadow-lg shadow-black/5">Add +</button>
+        {/* --- MENU GRID --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {menu.map((p, idx) => (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.05 }}
+              key={p.id} 
+              className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500"
+            >
+              <div className="relative h-60 overflow-hidden bg-gray-50">
+                <motion.img 
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
+                  src={p.img} 
+                  className="w-full h-full object-cover" 
+                />
+                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl text-xs font-black italic shadow-sm">
+                  ₹{p.price}
+                </div>
+              </div>
+
+              <div className="p-6">
+                <h3 className="text-sm font-black uppercase tracking-tight text-gray-800 mb-1">{p.name?.en}</h3>
+                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest mb-6 italic">Fresh & Hot</p>
+
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCart([...cart, p])}
+                  disabled={!p.inStock}
+                  className="w-full py-4 bg-[#1a1a1a] hover:bg-orange-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
+                >
+                  {p.inStock ? 'Add to Tray +' : 'Sold Out'}
+                </motion.button>
               </div>
             </motion.div>
-          )) : (
-             <div className="col-span-full py-20 text-center opacity-30 font-bold italic uppercase tracking-widest">Cooking the menu...</div>
-          )}
+          ))}
         </div>
       </main>
 
+      {/* --- FLOATING CHECKOUT BAR --- */}
       <AnimatePresence>
         {cart.length > 0 && (
-          <motion.div initial={{y:100}} animate={{y:0}} exit={{y:100}} className="fixed bottom-0 left-0 right-0 p-6 bg-white border-t rounded-t-[3rem] shadow-2xl z-[200]">
-             <div className="max-w-md mx-auto">
-                <div className="flex justify-between items-center mb-5 bg-green-50 p-3 rounded-2xl border border-green-100">
-                    <span className="text-[10px] font-black text-green-600 uppercase italic tracking-widest">Cashback Ready</span>
-                    <span className="text-xs font-black text-green-600">+ ₹{cashback}</span>
-                </div>
-                <button onClick={placeOrder} className="w-full py-5 bg-orange-600 text-white rounded-[2rem] font-black text-sm uppercase flex justify-between px-10 items-center shadow-xl shadow-orange-600/20">
-                  <span>Checkout</span>
-                  <span className="text-lg italic font-black">₹{itemTotal} →</span>
-                </button>
-             </div>
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-8 left-5 right-5 z-[200] max-w-lg mx-auto"
+          >
+            <div className="bg-white/90 backdrop-blur-2xl border border-white/20 p-5 rounded-[2.5rem] shadow-2xl flex justify-between items-center px-8">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black opacity-30 uppercase tracking-widest">Tray Total</span>
+                <span className="text-2xl font-black italic text-gray-900">₹{total}</span>
+              </div>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-orange-600 text-white px-10 py-5 rounded-[1.8rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-orange-600/30"
+              >
+                Place Order →
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
