@@ -2,14 +2,17 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// --- CONFIG: YOUR SECRET POWER ---
+const GEMINI_API_KEY = "AIzaSyD6BGkKRa7yl1eZNyvIS6WOkD2iu0axRKw"; 
+
 // --- ULTIMATE 19 ITEMS DATA ---
 const initialMenuData = [
-  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, reviews: 1240, img: "/img/malai-chaap.jpg" },
-  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, reviews: 890, img: "/img/masala-chaap.jpg" },
-  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, reviews: 1560, img: "/img/afghani-chaap.jpg" },
-  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, reviews: 750, img: "/img/achari-chaap.jpg" },
-  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, reviews: 2100, img: "/img/paneer-tikka.jpg" },
-  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, reviews: 430, img: "/img/mushroom-tikka.jpg" },
+  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, reviews: 1240, img: "/img/malai-chaap.jpg", desc: "Creamy Malout style soya chaap." },
+  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, reviews: 890, img: "/img/masala-chaap.jpg", desc: "Spicy and tangy masala soya chunks." },
+  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, reviews: 1560, img: "/img/afghani-chaap.jpg", desc: "Rich cashews and cream marination." },
+  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, reviews: 750, img: "/img/achari-chaap.jpg", desc: "Pickle flavoured spicy chaap." },
+  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, reviews: 2100, img: "/img/paneer-tikka.jpg", desc: "Classic tandoori paneer skewers." },
+  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, reviews: 430, img: "/img/mushroom-tikka.jpg", desc: "Roasted mushrooms in spicy curd." },
   { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 50, rating: 4.4, reviews: 620, img: "/img/frankie.jpg" },
   { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 90, rating: 4.7, reviews: 940, img: "/img/paneer-roll.jpg" },
   { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 70, rating: 4.6, reviews: 510, img: "/img/chaap-roll.jpg" },
@@ -32,6 +35,7 @@ const addonsData = [
 ];
 
 export default function Home() {
+  const [view, setView] = useState('HOME');
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
   const [addons, setAddons] = useState({});
@@ -41,7 +45,7 @@ export default function Home() {
   const [prepTime, setPrepTime] = useState(20);
   const [isKitchenOpen, setIsKitchenOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [orderStatus, setOrderStatus] = useState(null);
+  const [orderStatus, setOrderStatus] = useState(null); // 'Received', 'Marinating', 'Tandoor', 'Ready'
   const [cookingProgress, setCookingProgress] = useState(0);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showCustomizer, setShowCustomizer] = useState(null);
@@ -71,12 +75,31 @@ export default function Home() {
     localStorage.setItem('ft_final_prep', prepTime.toString());
   }, [menu, isKitchenOpen, prepTime]);
 
+  // --- LIVE TIMELINE LOGIC ---
   useEffect(() => {
-    let interval;
-    if (orderStatus === 'Preparing') {
-      interval = setInterval(() => { setCookingProgress(p => (p >= 100 ? 100 : p + 1.2)); }, 50);
-    } else setCookingProgress(0);
-    return () => clearInterval(interval);
+    if (orderStatus) {
+      const stages = ['Received', 'Marinating', 'Tandoor', 'Ready'];
+      const currentIndex = stages.indexOf(orderStatus);
+
+      if (currentIndex < stages.length - 1) {
+        // Move to next stage after 2.5 seconds
+        const timer = setTimeout(() => {
+          haptic();
+          setOrderStatus(stages[currentIndex + 1]);
+          setCookingProgress((currentIndex + 2) * 25); // 25%, 50%, 75%, 100%
+        }, 2500); 
+        return () => clearTimeout(timer);
+      } else if (orderStatus === 'Ready') {
+        // Finalize and Redirect
+        setCookingProgress(100);
+        const finalize = setTimeout(() => {
+            setOrderStatus(null);
+            setCart([]); setAddons({}); setShowCheckout(false);
+            // Redirect logic is in processOrder, but we can do a fallback here if needed
+        }, 2000);
+        return () => clearTimeout(finalize);
+      }
+    }
   }, [orderStatus]);
 
   const filteredItems = useMemo(() => menu.filter(i => 
@@ -89,17 +112,19 @@ export default function Home() {
   const processOrder = (method) => {
     if (!isKitchenOpen && !isAdmin) return;
     haptic();
-    setOrderStatus('Preparing');
+    // Start the Timeline
+    setOrderStatus('Received');
+    setCookingProgress(10);
+
     const itemsStr = cart.map(i => `• ${i.name[lang]} (${i.spice})`).join('\n');
     const adsStr = addonsData.filter(a => addons[a.id]).map(a => `• ${a.name[lang]} x ${addons[a.id]}`).join('\n');
     const msg = `*THE FLAVOUR'S TOWN ORDER*\n*ID:* ${sessionOrderId}\n\n*Items:*\n${itemsStr}\n\n${adsStr ? `*Addons:*\n${adsStr}\n` : ''}*Total:* ₹${subtotal}\n*Wait Time:* ${prepTime}m\n📍 Malout, Punjab`;
 
+    // Wait for timeline to finish (approx 7.5s) then redirect
     setTimeout(() => {
-      setOrderStatus(null);
       if (method === 'WA') window.location.assign(`https://api.whatsapp.com/send?phone=919877474778&text=${encodeURIComponent(msg)}`);
       else window.location.assign(`upi://pay?pa=9877474778@paytm&pn=FlavoursTown&am=${subtotal}&cu=INR`);
-      setCart([]); setAddons({}); setShowCheckout(false);
-    }, 4000);
+    }, 8000); 
   };
 
   return (
@@ -167,7 +192,6 @@ export default function Home() {
                       <div className="absolute top-3 right-3 bg-black/80 px-2.5 py-1 rounded-xl text-[10px] font-black text-yellow-400">⭐ {p.rating}</div>
                     </div>
                     <div className="text-center">
-                      {/* HIGH CONTRAST NAME FIX */}
                       <h3 className={`text-[13px] font-black uppercase mb-1 h-12 flex items-center justify-center leading-none tracking-tighter italic ${isDark ? 'text-white' : 'text-black'}`}>{p.name[lang]}</h3>
                       <p className="text-orange-500 font-black text-3xl mb-5 tracking-tighter italic">₹{p.price}</p>
                       <button 
@@ -309,7 +333,7 @@ export default function Home() {
         <div className="flex justify-center gap-16 mb-32 z-20 relative opacity-40 hover:opacity-100 transition-all scale-110">
           <a href="https://github.com/Object2005" target="_blank" className="hover:scale-150 transition-all"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" className={`w-12 h-12 ${isDark ? 'invert' : ''}`} alt="GitHub" /></a>
           <a href="https://linkedin.com/in/aashray-narang" target="_blank" className="hover:scale-150 transition-all"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" className="w-12 h-12" alt="LinkedIn" /></a>
-          <a href="mailto:aashraynarang@gmail.com" className="hover:scale-150 transition-all"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" className="w-12 h-12" alt="Email" /></a>
+          <a href="mailto:narangaashray34@gmail.com" className="hover:scale-150 transition-all"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" className="w-12 h-12" alt="Email" /></a>
         </div>
         
         <div className="z-20 relative opacity-10 font-black">
@@ -337,17 +361,32 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* PROGRESS OVERLAY (ENGINE) */}
+      {/* --- LIVE TIMELINE OVERLAY (THE NEW MONSTER UI) --- */}
       <AnimatePresence>
         {orderStatus && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/99 z-[5000] flex flex-col items-center justify-center p-20 backdrop-blur-[100px] overflow-hidden text-center">
-             <motion.div animate={{ scale:[1, 1.4, 1], rotate:[0, 20, -20, 0] }} transition={{repeat:Infinity, duration:2.2}} className="text-[15rem] mb-20 drop-shadow-[0_0_120px_rgba(234,88,12,0.9)]">🥘</motion.div>
-             <h2 className="text-9xl font-black italic uppercase tracking-tighter mb-10 text-orange-600 underline decoration-white/10 underline-offset-[30px] decoration-[14px]">COOKING!</h2>
-             <p className="text-xl text-gray-500 mb-28 uppercase tracking-[0.8em] font-black max-w-2xl leading-loose italic opacity-60">Master Chef is currently crafts your special meal...</p>
-             <div className="w-[35rem] h-5 bg-zinc-900 rounded-full overflow-hidden border-2 border-white/20 relative shadow-[0_0_80px_rgba(234,88,12,0.5)]">
-                <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-gradient-to-r from-orange-500 to-red-600 shadow-[0_0_120px_rgba(234,88,12,1)] rounded-full"></motion.div>
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/99 z-[6000] flex flex-col items-center justify-center p-12 text-center backdrop-blur-3xl overflow-hidden">
+             {/* DYNAMIC ICON */}
+             <motion.div animate={{ scale:[1, 1.3, 1], rotate:[0, 10, -10, 0] }} transition={{repeat:Infinity, duration:2}} className="text-[12rem] mb-12 drop-shadow-[0_0_100px_rgba(234,88,12,0.8)]">
+                {orderStatus === 'Received' ? '📝' : orderStatus === 'Marinating' ? '🥣' : orderStatus === 'Tandoor' ? '🔥' : '✅'}
+             </motion.div>
+
+             {/* DYNAMIC STATUS TEXT */}
+             <h2 className="text-7xl font-black italic uppercase text-orange-600 mb-8 tracking-tighter leading-none shadow-orange-600/20">
+                {orderStatus === 'Received' ? 'Order Received' : orderStatus === 'Marinating' ? 'Chef is Marinating' : orderStatus === 'Tandoor' ? 'In the Tandoor' : 'Order Ready!'}
+             </h2>
+
+             {/* PROGRESS BAR */}
+             <div className="w-full max-w-xl h-5 bg-zinc-950 rounded-full border-2 border-white/10 relative shadow-[0_0_60px_black] ring-[15px] ring-orange-600/5 mb-12">
+                <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-gradient-to-r from-orange-500 via-red-600 to-yellow-500 rounded-full shadow-[0_0_40px_orange]"></motion.div>
              </div>
-             <p className="text-[16px] font-black uppercase tracking-[1.5em] text-orange-600 animate-pulse italic mt-14 shadow-orange-600/10">SYNCING DIGITAL RECEIPT...</p>
+
+             {/* 4-STEP TEXT INDICATORS */}
+             <div className="flex gap-4 font-black text-[10px] uppercase tracking-widest italic opacity-60">
+                <span className={orderStatus === 'Received' ? 'text-orange-500 scale-125' : 'text-gray-600'}>1. Received</span>
+                <span className={orderStatus === 'Marinating' ? 'text-orange-500 scale-125' : 'text-gray-600'}>2. Marinating</span>
+                <span className={orderStatus === 'Tandoor' ? 'text-orange-500 scale-125' : 'text-gray-600'}>3. Tandoor</span>
+                <span className={orderStatus === 'Ready' ? 'text-green-500 scale-125' : 'text-gray-600'}>4. Ready</span>
+             </div>
           </motion.div>
         )}
       </AnimatePresence>
