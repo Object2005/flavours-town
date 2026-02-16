@@ -3,44 +3,49 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIG ---
-// NOTE: Sound file browser block kar sakda hai, Admin panel te click zaroori hai.
+// NOTE: Ensure your /public/img/ folder has these exact filenames.
 
-// --- MENU DATA (19 ITEMS HD) ---
+// --- YOUR ORIGINAL LOCAL IMAGES ---
 const initialMenuData = [
-  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 120, rating: 4.8, img: "https://images.unsplash.com/photo-1626132647523-66f5bf380027?q=80&w=800&auto=format&fit=crop" },
-  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 110, rating: 4.7, img: "https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?q=80&w=800&auto=format&fit=crop" },
-  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 130, rating: 4.9, img: "https://images.unsplash.com/photo-1606471191009-63994c53433b?q=80&w=800&auto=format&fit=crop" },
-  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 110, rating: 4.6, img: "https://media.istockphoto.com/id/1334115358/photo/soya-chaap.jpg?s=612x612&w=0&k=20&c=L_YcnImtQ_8vQoKkXN7ljP7sZq_g_8v_Q_8v_Q_8v_Q=" },
-  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 160, rating: 4.9, img: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=800&auto=format&fit=crop" },
-  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 150, rating: 4.5, img: "https://images.unsplash.com/photo-1533742672439-d3a9856cc6b7?q=80&w=800&auto=format&fit=crop" },
-  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 60, rating: 4.4, img: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800&auto=format&fit=crop" },
-  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 100, rating: 4.7, img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop" },
-  { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 90, rating: 4.6, img: "https://images.unsplash.com/photo-1541529086526-db283c563270?q=80&w=800&auto=format&fit=crop" },
-  { id: 10, category: "Rolls", isBest: false, name: { en: "Mushroom Roll", pu: "ਮਸ਼ਰੂਮ ਰੋਲ" }, price: 90, rating: 4.5, img: "https://media.istockphoto.com/id/1155363769/photo/mushroom-tikka-wrap.jpg?s=612x612&w=0&k=20&c=1" },
-  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 80, rating: 4.8, img: "https://images.unsplash.com/photo-1606491956689-2ea28c674675?q=80&w=800&auto=format&fit=crop" },
-  { id: 12, category: "Rolls", isBest: false, name: { en: "Twister Roll", pu: "ਟਵਿਸਟਰ ਰੋਲ" }, price: 80, rating: 4.3, img: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?q=80&w=800&auto=format&fit=crop" },
-  { id: 13, category: "Snacks", isBest: false, name: { en: "Paneer Bhurji Kulcha", pu: "ਪਨੀਰ ਭੁਰਜੀ ਕੁਲਚਾ" }, price: 140, rating: 4.7, img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=800&auto=format&fit=crop" },
-  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 220, rating: 4.9, img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=800&auto=format&fit=crop" },
-  { id: 15, category: "Snacks", isBest: false, name: { en: "Kacha Paneer", pu: "ਕੱਚਾ ਪਨੀਰ" }, price: 100, rating: 4.2, img: "https://images.unsplash.com/photo-1551881192-002e02ad3d87?q=80&w=800&auto=format&fit=crop" },
-  { id: 16, category: "Snacks", isBest: false, name: { en: "Paneer Fry", pu: "ਪਨੀਰ ਫਰਾਈ" }, price: 180, rating: 4.7, img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?q=80&w=800&auto=format&fit=crop" },
-  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 40, rating: 4.9, img: "https://images.unsplash.com/photo-1593701461250-d71f34a75428?q=80&w=800&auto=format&fit=crop" },
-  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 60, rating: 5.0, img: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=800&auto=format&fit=crop" },
-  { id: 19, category: "Sweets", isBest: false, name: { en: "Garam Gajrela", pu: "ਗਰਮ ਗਜਰੇਲਾ" }, price: 60, rating: 4.9, img: "https://images.unsplash.com/photo-1631273937923-397223b72c91?q=80&w=800&auto=format&fit=crop" }
+  { id: 1, category: "Chaap", isBest: true, name: { en: "Malai Chaap", pu: "ਮਲਾਈ ਚਾਪ" }, price: 100, rating: 4.8, img: "/img/malai-chaap.jpg" },
+  { id: 2, category: "Chaap", isBest: false, name: { en: "Masala Chaap", pu: "ਮਸਾਲਾ ਚਾਪ" }, price: 100, rating: 4.7, img: "/img/masala-chaap.jpg" },
+  { id: 3, category: "Chaap", isBest: true, name: { en: "Afghani Chaap", pu: "ਅਫਗਾਨੀ ਚਾਪ" }, price: 100, rating: 4.9, img: "/img/afghani-chaap.jpg" },
+  { id: 4, category: "Chaap", isBest: false, name: { en: "Achari Chaap", pu: "ਅਚਾਰੀ ਚਾਪ" }, price: 100, rating: 4.6, img: "/img/achari-chaap.jpg" },
+  { id: 5, category: "Tikka", isBest: true, name: { en: "Paneer Tikka", pu: "ਪਨੀਰ ਟਿੱਕਾ" }, price: 140, rating: 4.9, img: "/img/paneer-tikka.jpg" },
+  { id: 6, category: "Tikka", isBest: false, name: { en: "Mushroom Tikka", pu: "ਮਸ਼ਰੂਮ ਟਿੱਕਾ" }, price: 120, rating: 4.5, img: "/img/mushroom-tikka.jpg" },
+  { id: 7, category: "Rolls", isBest: false, name: { en: "Frankie Roll", pu: "ਫਰੈਂਕੀ ਰੋਲ" }, price: 50, rating: 4.4, img: "/img/frankie.jpg" },
+  { id: 8, category: "Rolls", isBest: true, name: { en: "Paneer Roll", pu: "ਪਨੀਰ ਰੋਲ" }, price: 90, rating: 4.7, img: "/img/paneer-roll.jpg" },
+  { id: 9, category: "Rolls", isBest: false, name: { en: "Chaap Roll", pu: "ਚਾਪ ਰੋਲ" }, price: 70, rating: 4.6, img: "/img/chaap-roll.jpg" },
+  { id: 10, category: "Rolls", isBest: false, name: { en: "Mushroom Roll", pu: "ਮਸ਼ਰੂਮ ਰੋਲ" }, price: 90, rating: 4.5, img: "/img/mushroom-roll.jpg" },
+  { id: 11, category: "Snacks", isBest: true, name: { en: "Pav Bhaji", pu: "ਪਾਓ ਭਾਜੀ" }, price: 50, rating: 4.8, img: "/img/pav-bhaji.jpg" },
+  { id: 12, category: "Rolls", isBest: false, name: { en: "Twister Roll", pu: "ਟਵਿਸਟਰ ਰੋਲ" }, price: 50, rating: 4.3, img: "/img/twister.jpg" },
+  { id: 13, category: "Snacks", isBest: false, name: { en: "Paneer Bhurji Kulcha", pu: "ਪਨੀਰ ਭੁਰਜੀ ਕੁਲਚਾ" }, price: 90, rating: 4.8, img: "/img/kulcha.jpg" },
+  { id: 14, category: "Snacks", isBest: true, name: { en: "Cheese Chilli", pu: "ਚੀਜ਼ ਚਿੱਲੀ" }, price: 250, rating: 4.9, img: "/img/cheese-chilli.jpg" },
+  { id: 15, category: "Snacks", isBest: false, name: { en: "Kacha Paneer", pu: "ਕੱਚਾ ਪਨੀਰ" }, price: 50, rating: 4.2, img: "/img/kacha-paneer.jpg" },
+  { id: 16, category: "Snacks", isBest: false, name: { en: "Paneer Fry", pu: "ਪਨੀਰ ਫਰਾਈ" }, price: 130, rating: 4.7, img: "/img/paneer-fry.jpg" },
+  { id: 17, category: "Sweets", isBest: true, name: { en: "Gulab Jamun", pu: "ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 20, rating: 4.9, img: "/img/gulab-jamun.jpg" },
+  { id: 18, category: "Sweets", isBest: true, name: { en: "Rabri Gulab Jamun", pu: "ਰਬੜੀ ਗੁਲਾਬ ਜਾਮੁਨ" }, price: 30, rating: 5.0, img: "/img/rabri-jamun.jpg" },
+  { id: 19, category: "Sweets", isBest: false, name: { en: "Garam Gajrela", pu: "ਗਰਮ ਗਜਰੇਲਾ" }, price: 50, rating: 4.9, img: "/img/gajrela.jpg" }
+];
+
+// --- ADDONS DATA ---
+const addonsData = [
+  { id: 'r1', name: "Rumali Roti", price: 10 },
+  { id: 'r2', name: "Butter Naan", price: 40 },
+  { id: 'p1', name: "Salad & Sauce", price: 0 },
+  { id: 'p2', name: "Packing Charge", price: 10 }
 ];
 
 // --- COUNTDOWN COMPONENT ---
 const CountdownTimer = ({ targetDate }) => {
   const [display, setDisplay] = useState("Wait...");
-  
   useEffect(() => {
     if (!targetDate) return;
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const distance = targetDate - now;
-      if (distance < 0) {
-        setDisplay("READY! ✅");
-        clearInterval(interval);
-      } else {
+      if (distance < 0) { setDisplay("READY! ✅"); clearInterval(interval); } 
+      else {
         const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((distance % (1000 * 60)) / 1000);
         setDisplay(`${m}m ${s}s`);
@@ -48,38 +53,54 @@ const CountdownTimer = ({ targetDate }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [targetDate]);
-
-  return <span className="font-mono text-orange-400 font-bold">{display}</span>;
+  return <span className="font-mono text-orange-500 font-bold tracking-widest">{display}</span>;
 };
 
-// --- QR SCANNER COMPONENT (Fixed) ---
+// --- QR SCANNER (FIXED) ---
 const QRScanner = ({ onClose }) => {
     const videoRef = useRef(null);
-    const [streamError, setStreamError] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        let currentStream;
-        const startStream = async () => {
+        let stream = null;
+        const startCamera = async () => {
             try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                if (videoRef.current) videoRef.current.srcObject = currentStream;
+                // Request camera with playsInline for iOS
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    // Required for some mobile browsers to actually play
+                    videoRef.current.play();
+                }
             } catch (err) {
-                setStreamError("Camera Access Denied or Not Supported.");
+                console.error("Camera Error:", err);
+                setError("Camera permission denied or not available.");
             }
         };
-        startStream();
-        return () => { if(currentStream) currentStream.getTracks().forEach(track => track.stop()); }
+        startCamera();
+        return () => { if(stream) stream.getTracks().forEach(t => t.stop()); }
     }, []);
 
     return (
         <div className="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center p-4">
-            <h2 className="text-white font-black text-xl mb-6">SCAN UPI QR CODE</h2>
-            <div className="w-72 h-72 bg-zinc-900 border-4 border-orange-500 rounded-3xl overflow-hidden relative shadow-[0_0_50px_orange]">
-                {streamError ? <div className="text-red-500 text-center p-8 font-bold">{streamError}</div> : <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />}
-                <div className="absolute inset-0 border-[40px] border-black/40"></div>
+            <h2 className="text-white font-black text-xl mb-6">SCAN CART QR</h2>
+            <div className="w-full max-w-xs aspect-square bg-zinc-900 border-4 border-orange-500 rounded-3xl overflow-hidden relative shadow-[0_0_50px_orange]">
+                {error ? (
+                    <p className="text-red-500 text-center p-8 font-bold">{error}<br/><span className="text-white text-xs font-normal">Check browser permissions</span></p>
+                ) : (
+                    <video 
+                        ref={videoRef} 
+                        autoPlay 
+                        playsInline 
+                        muted 
+                        className="w-full h-full object-cover" 
+                    />
+                )}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-white/30 animate-pulse rounded-lg"></div>
             </div>
-            <p className="text-gray-500 text-xs mt-4">Point camera at the shop's QR code</p>
+            <p className="text-gray-500 text-xs mt-4 text-center">Use another phone to pay if scanning fails.</p>
             <button onClick={onClose} className="mt-8 bg-white text-black px-8 py-3 rounded-full font-bold">CLOSE</button>
         </div>
     );
@@ -87,6 +108,7 @@ const QRScanner = ({ onClose }) => {
 
 export default function Home() {
   const [cart, setCart] = useState([]);
+  const [addons, setAddons] = useState({}); 
   const [isAdmin, setIsAdmin] = useState(false);
   const [liveOrders, setLiveOrders] = useState([]);
   const [myOrder, setMyOrder] = useState(null);
@@ -98,95 +120,100 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [prepTime, setPrepTime] = useState(20);
   const [lang, setLang] = useState('pu');
+  const [isDark, setIsDark] = useState(true);
+  const [isKitchenOpen, setIsKitchenOpen] = useState(true);
+  const [menu, setMenu] = useState(initialMenuData.map(i => ({...i, inStock: true})));
 
-  // --- INIT SYSTEM (V15) ---
+  // --- INIT ---
   useEffect(() => {
-    // Generate Session ID once
     setSessionOrderId(`FT-${Math.floor(1000 + Math.random() * 9000)}`);
-    
     if ("Notification" in window) Notification.requestPermission();
+    
+    // Load Saved Data
+    const savedMenu = localStorage.getItem('ft_v17_menu');
+    if (savedMenu) setMenu(JSON.parse(savedMenu));
 
-    // MAIN SYNC LOOP (Runs every 1s)
     const interval = setInterval(() => {
-        // Fetch Orders from "Server" (LocalStorage V15)
-        const allOrders = JSON.parse(localStorage.getItem('ft_v15_orders') || '[]');
+        const storedOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
+        setLiveOrders(storedOrders);
+        const myActive = storedOrders.find(o => o.id === sessionOrderId);
+        if (myActive) setMyOrder(myActive);
         
-        // Update Admin View
-        setLiveOrders(allOrders);
-
-        // Update User View (My Order Status)
-        const found = allOrders.find(o => o.id === sessionOrderId);
-        if (found) setMyOrder(found);
-
+        if (isAdmin && storedOrders.length > liveOrders.length) {
+             try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){}
+        }
     }, 1000);
-
     return () => clearInterval(interval);
-  }, [sessionOrderId]);
+  }, [isAdmin, sessionOrderId, liveOrders.length]);
 
-  // --- ORDER HANDLING ---
+  // --- LOGIC ---
+  const subtotal = cart.reduce((acc, i) => acc + i.price, 0) + 
+                   addonsData.reduce((acc, ad) => acc + (ad.price * (addons[ad.id] || 0)), 0);
+
   const placeOrder = (method) => {
     if (!userDetails.name || !userDetails.phone) return alert("Please enter Name & Phone!");
+    if (!isKitchenOpen) return alert("Shop is Closed!");
     
-    // WHATSAPP REDIRECT (Reliable API)
+    const addonsStr = addonsData.filter(a => addons[a.id]).map(a => `${a.name} x${addons[a.id]}`).join(', ');
+    
     if (method === 'WA') {
-        const text = `*Order: ${sessionOrderId}*\nName: ${userDetails.name}\nTotal: ₹${cart.reduce((a,b)=>a+b.price,0)}`;
+        const text = `*Order: ${sessionOrderId}*\nName: ${userDetails.name}\nTotal: ₹${subtotal}\nItems: ${cart.map(i=>i.name.en).join(', ')}\n${addonsStr ? 'Addons: ' + addonsStr : ''}`;
         window.location.href = `https://api.whatsapp.com/send?phone=919877474778&text=${encodeURIComponent(text)}`;
-        return; // Don't save strictly if redirecting, or save then redirect.
+        return;
     }
 
-    const finishTime = new Date().getTime() + (prepTime * 60 * 1000);
     const newOrder = {
         id: sessionOrderId,
         user: userDetails,
         items: cart,
-        total: cart.reduce((a, b) => a + b.price, 0),
+        addons: addons,
+        total: subtotal,
         status: 'Pending',
-        targetTime: finishTime,
+        targetTime: new Date().getTime() + (prepTime * 60 * 1000),
         method: method,
         timestamp: new Date().toISOString()
     };
 
-    // SAVE TO "SERVER"
-    const currentOrders = JSON.parse(localStorage.getItem('ft_v15_orders') || '[]');
-    localStorage.setItem('ft_v15_orders', JSON.stringify([...currentOrders, newOrder]));
-    
-    // Play Sound for User Feedback
-    try { new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3').play(); } catch(e){}
-
-    setMyOrder(newOrder);
-    setCart([]);
-    setShowCheckout(false);
+    const currentOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
+    localStorage.setItem('ft_v17_orders', JSON.stringify([...currentOrders, newOrder]));
+    setMyOrder(newOrder); setCart([]); setAddons({}); setShowCheckout(false);
   };
 
-  const adminUpdateStatus = (orderId, newStatus) => {
-      const allOrders = JSON.parse(localStorage.getItem('ft_v15_orders') || '[]');
-      const updated = allOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-      localStorage.setItem('ft_v15_orders', JSON.stringify(updated));
+  const updateStatus = (id, status) => {
+      const allOrders = JSON.parse(localStorage.getItem('ft_v17_orders') || '[]');
+      const updated = allOrders.map(o => o.id === id ? { ...o, status } : o);
+      localStorage.setItem('ft_v17_orders', JSON.stringify(updated));
       setLiveOrders(updated);
   };
 
-  const filteredItems = initialMenuData.filter(i => {
+  const toggleStock = (id) => {
+      const updatedMenu = menu.map(i => i.id === id ? { ...i, inStock: !i.inStock } : i);
+      setMenu(updatedMenu);
+      localStorage.setItem('ft_v17_menu', JSON.stringify(updatedMenu));
+  };
+
+  const filteredItems = menu.filter(i => {
       const searchMatch = i.name.en.toLowerCase().includes(searchQuery.toLowerCase());
       const catMatch = activeCategory === "All" || i.category === activeCategory;
       return searchMatch && catMatch;
   });
 
   return (
-    <div className={`min-h-screen text-white font-sans selection:bg-orange-500/30 overflow-x-hidden ${isAdmin ? 'bg-[#0a0c10]' : 'bg-[#050505]'}`}>
-      <Head><title>Flavour's Town V15</title></Head>
+    <div className={`min-h-screen font-sans selection:bg-orange-500/30 overflow-x-hidden transition-colors duration-500 ${isDark ? 'bg-[#050505] text-white' : 'bg-[#fcfbf7] text-black'}`}>
+      <Head><title>Flavour's Town V17</title></Head>
 
-      {/* --- CAMERA --- */}
       {showScanner && <QRScanner onClose={() => setShowScanner(false)} />}
 
       {/* --- HEADER --- */}
-      <header className={`fixed top-0 w-full z-[100] px-4 py-3 backdrop-blur-xl border-b flex justify-between items-center ${isAdmin ? 'bg-zinc-900/80 border-orange-500/20' : 'bg-black/60 border-white/5'}`}>
+      <header className={`fixed top-0 w-full z-[100] px-4 py-3 backdrop-blur-xl border-b flex justify-between items-center transition-all ${isDark ? 'bg-black/60 border-white/5' : 'bg-white/80 border-black/5'}`}>
         <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-tr from-orange-600 to-red-600 h-9 w-9 rounded-lg flex items-center justify-center font-black shadow-lg">FT</div>
-          <div><h1 className="text-xs font-black uppercase tracking-tight">{isAdmin ? 'COMMAND CENTER' : "FLAVOUR'S TOWN"}</h1><p className="text-[9px] text-gray-400">MALOUT</p></div>
+          <div className="bg-gradient-to-tr from-orange-600 to-red-600 h-9 w-9 rounded-lg flex items-center justify-center font-black shadow-lg text-white">FT</div>
+          <div><h1 className="text-xs font-black uppercase tracking-tight">Flavour's Town</h1><p className={`text-[9px] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>MALOUT</p></div>
         </div>
         <div className="flex gap-2">
-            {!isAdmin && <button onClick={() => setLang(lang==='pu'?'en':'pu')} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black">{lang==='pu'?'EN':'ਪੰ'}</button>}
-            <button onClick={() => { const p=prompt("Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs hover:bg-orange-600 transition-all">⚙️</button>
+            <button onClick={() => setIsDark(!isDark)} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>{isDark ? '☀️' : '🌙'}</button>
+            {!isAdmin && <button onClick={() => setLang(lang==='pu'?'en':'pu')} className={`px-3 py-1 border rounded-lg text-[9px] font-black ${isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'}`}>{lang==='pu'?'EN':'ਪੰ'}</button>}
+            <button onClick={() => { const p=prompt("Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs hover:bg-orange-600 transition-all ${isDark ? 'bg-white/5' : 'bg-black/5'}`}>⚙️</button>
         </div>
       </header>
 
@@ -197,46 +224,62 @@ export default function Home() {
             <div className="animate-in fade-in duration-500">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-black italic text-orange-500">LIVE ORDERS</h2>
-                    <button onClick={() => { if(confirm("Clear All Data?")) localStorage.removeItem('ft_v15_orders'); }} className="text-[10px] text-red-500 underline">RESET SYSTEM</button>
+                    <div className="flex gap-2">
+                        <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`px-4 py-2 rounded-full text-[10px] font-bold ${isKitchenOpen ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>{isKitchenOpen ? 'OPEN' : 'CLOSED'}</button>
+                        <button onClick={() => { if(confirm("Reset?")) localStorage.removeItem('ft_v17_orders'); }} className="text-[10px] text-red-500 underline">RESET</button>
+                    </div>
                 </div>
                 
-                {/* PREP TIME SETTING */}
-                <div className="bg-zinc-900/50 p-4 rounded-2xl border border-white/10 mb-6 flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase text-gray-400">Set Prep Time</span>
+                {/* PREP TIME */}
+                <div className={`p-4 rounded-2xl border mb-6 flex justify-between items-center ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-black/10 shadow-sm'}`}>
+                    <span className="text-xs font-bold uppercase opacity-50">Set Prep Time</span>
                     <div className="flex gap-3 items-center">
-                        <button onClick={()=>setPrepTime(p=>Math.max(5, p-5))} className="bg-white/10 w-8 h-8 rounded-full">-</button>
+                        <button onClick={()=>setPrepTime(p=>Math.max(5, p-5))} className="w-8 h-8 rounded-full bg-gray-500/10">-</button>
                         <span className="font-mono font-bold text-xl text-orange-500">{prepTime}m</span>
-                        <button onClick={()=>setPrepTime(p=>p+5)} className="bg-white/10 w-8 h-8 rounded-full">+</button>
+                        <button onClick={()=>setPrepTime(p=>p+5)} className="w-8 h-8 rounded-full bg-gray-500/10">+</button>
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    {liveOrders.length === 0 && <p className="text-center text-gray-600 py-10">No orders yet...</p>}
+                <div className="space-y-3 mb-10">
+                    {liveOrders.length === 0 && <p className="text-center opacity-50 py-10">No orders yet...</p>}
                     {liveOrders.slice().reverse().map((order) => (
-                       <div key={order.id} className={`p-5 rounded-[1.5rem] border ${order.status === 'Ready' ? 'border-green-500/30 bg-green-900/10' : 'border-white/10 bg-zinc-900/50'}`}>
+                       <div key={order.id} className={`p-5 rounded-[1.5rem] border ${isDark ? 'bg-zinc-900/50 border-white/10' : 'bg-white border-black/10 shadow-md'} ${order.status === 'Ready' ? 'border-green-500/50' : ''}`}>
                            <div className="flex justify-between items-start mb-3">
                                <div>
-                                   <h3 className="font-bold text-base text-white">{order.user.name}</h3>
-                                   <a href={`tel:${order.user.phone}`} className="text-[10px] text-orange-400 underline">{order.user.phone}</a>
-                                   <div className="mt-2 bg-black/40 px-3 py-1 rounded-lg inline-block border border-white/5">
-                                      <span className="text-[10px] text-gray-400 mr-2">TIMER:</span>
+                                   <h3 className="font-bold text-base">{order.user.name}</h3>
+                                   <a href={`tel:${order.user.phone}`} className="text-[10px] text-orange-500 underline">{order.user.phone}</a>
+                                   <div className="mt-2 bg-gray-500/10 px-3 py-1 rounded-lg inline-block">
                                       <CountdownTimer targetDate={order.targetTime} />
                                    </div>
                                </div>
                                <div className="text-right">
-                                   <p className="text-xl font-black text-white">₹{order.total}</p>
-                                   <span className="text-[9px] uppercase font-bold bg-white/10 px-2 py-1 rounded text-gray-300 block mt-1">{order.method}</span>
+                                   <p className="text-xl font-black">₹{order.total}</p>
+                                   <span className="text-[9px] uppercase font-bold bg-gray-500/10 px-2 py-1 rounded opacity-70 block mt-1">{order.method}</span>
                                </div>
                            </div>
-                           <div className="text-xs text-gray-400 border-t border-white/5 pt-2 mt-2">
+                           <div className="text-xs opacity-60 border-t border-gray-500/20 pt-2 mt-2">
                                {order.items.map(i => i.name.en).join(', ')}
+                               {Object.keys(order.addons || {}).map(key => {
+                                   const ad = addonsData.find(a => a.id === key);
+                                   return order.addons[key] > 0 ? <div key={key} className="text-orange-500">+ {ad.name} (x{order.addons[key]})</div> : null;
+                               })}
                            </div>
                            <div className="grid grid-cols-4 gap-2 mt-4">
                                {['Pending', 'Accepted', 'Cooking', 'Ready'].map((status) => (
-                                   <button key={status} onClick={() => adminUpdateStatus(order.id, status)} className={`py-2 rounded-lg text-[9px] font-black uppercase border ${order.status === status ? 'bg-orange-600 border-orange-500 text-white' : 'bg-transparent border-white/10 text-gray-500'}`}>{status}</button>
+                                   <button key={status} onClick={() => updateStatus(order.id, status)} className={`py-2 rounded-lg text-[9px] font-black uppercase border ${order.status === status ? 'bg-orange-600 border-orange-500 text-white' : 'bg-transparent border-gray-500/20 opacity-50'}`}>{status}</button>
                                ))}
                            </div>
                        </div> 
+                    ))}
+                </div>
+
+                {/* STOCK MANAGER */}
+                <h3 className="text-xs font-black uppercase opacity-50 mb-4">STOCK CONTROL</h3>
+                <div className="grid grid-cols-2 gap-3">
+                    {menu.map(m => (
+                        <button key={m.id} onClick={()=>toggleStock(m.id)} className={`p-3 rounded-xl border text-left text-[10px] font-bold uppercase ${m.inStock ? 'border-green-500/30 text-green-500' : 'border-red-500/30 text-red-500 grayscale'}`}>
+                            {m.name.en} <br/> {m.inStock ? 'IN STOCK' : 'SOLD OUT'}
+                        </button>
                     ))}
                 </div>
             </div>
@@ -244,42 +287,42 @@ export default function Home() {
             // ================= USER INTERFACE =================
             <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_300px] gap-8 items-start">
                 
-                {/* SIDEBAR (Desktop) */}
+                {/* SIDEBAR */}
                 <aside className="hidden lg:block sticky top-24 space-y-2">
-                    <button onClick={() => setActiveCategory("All")} className={`w-full text-left px-5 py-3 rounded-xl font-bold text-xs border ${activeCategory === "All" ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-500'}`}>ALL ITEMS</button>
+                    <button onClick={() => setActiveCategory("All")} className={`w-full text-left px-5 py-3 rounded-xl font-bold text-xs border transition-all ${activeCategory === "All" ? 'bg-orange-600 text-white border-orange-600' : 'border-transparent opacity-50 hover:opacity-100'}`}>ALL ITEMS</button>
                     {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
-                        <button key={cat} onClick={() => setActiveCategory(cat)} className={`w-full text-left px-5 py-3 rounded-xl font-bold text-xs border ${activeCategory === cat ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-500'}`}>{cat}</button>
+                        <button key={cat} onClick={() => setActiveCategory(cat)} className={`w-full text-left px-5 py-3 rounded-xl font-bold text-xs border transition-all ${activeCategory === cat ? 'bg-orange-600 text-white border-orange-600' : 'border-transparent opacity-50 hover:opacity-100'}`}>{cat}</button>
                     ))}
                 </aside>
 
                 {/* MAIN FEED */}
                 <main className="w-full">
-                    {/* Search */}
                     <div className="relative mb-6">
-                        <input type="text" placeholder="Search menu..." onChange={e=>setSearchQuery(e.target.value)} className="w-full bg-[#0a0a0a] border border-white/10 p-4 rounded-2xl outline-none focus:border-orange-500/50 text-sm font-bold text-white placeholder:text-gray-700" />
+                        <input type="text" placeholder="Search menu..." onChange={e=>setSearchQuery(e.target.value)} className={`w-full border p-4 rounded-2xl outline-none focus:border-orange-500 transition-all text-sm font-bold ${isDark ? 'bg-[#0a0a0a] border-white/10 text-white' : 'bg-white border-black/10 text-black shadow-sm'}`} />
                     </div>
 
-                    {/* Mobile Tabs */}
                     <div className="flex lg:hidden gap-2 overflow-x-auto pb-4 no-scrollbar mb-2">
-                        <button onClick={() => setActiveCategory("All")} className={`px-5 py-2 rounded-full text-[10px] font-black uppercase border ${activeCategory==="All" ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-gray-500'}`}>All</button>
+                        <button onClick={() => setActiveCategory("All")} className={`px-5 py-2 rounded-full text-[10px] font-black uppercase border ${activeCategory==="All" ? 'bg-orange-600 text-white border-orange-600' : 'border-gray-500/20 opacity-60'}`}>All</button>
                         {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
-                            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-5 py-2 rounded-full text-[10px] font-black uppercase whitespace-nowrap border ${activeCategory===cat ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-gray-500'}`}>{cat}</button>
+                            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-5 py-2 rounded-full text-[10px] font-black uppercase whitespace-nowrap border ${activeCategory===cat ? 'bg-orange-600 text-white border-orange-600' : 'border-gray-500/20 opacity-60'}`}>{cat}</button>
                         ))}
                     </div>
 
-                    {/* 2-COLUMN GRID (MOBILE) / 3-COL (DESKTOP) */}
                     <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
                         {filteredItems.map(p => (
-                            <motion.div whileTap={{scale:0.97}} key={p.id} className="bg-[#0a0a0a] border border-white/10 rounded-[1.5rem] overflow-hidden relative group">
-                                <div className="h-32 md:h-48 overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                                    <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <span className="absolute bottom-2 left-3 z-20 text-white font-black text-xs md:text-sm">₹{p.price}</span>
-                                    <span className="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-yellow-400">★ {p.rating}</span>
+                            <motion.div whileTap={{scale:0.97}} key={p.id} className={`border rounded-[1.5rem] overflow-hidden relative group ${isDark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-black/5 shadow-md'} ${!p.inStock ? 'grayscale opacity-60' : ''}`}>
+                                <div className="h-32 md:h-48 overflow-hidden relative bg-gray-800">
+                                    <img src={p.img} className="w-full h-full object-cover" />
+                                    <span className="absolute bottom-2 left-3 z-20 text-white font-black text-xs md:text-sm drop-shadow-md">₹{p.price}</span>
+                                    <span className="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-white">★ {p.rating}</span>
                                 </div>
-                                <div className="p-3 relative z-20">
-                                    <h3 className="text-[11px] md:text-sm font-bold uppercase mb-2 leading-tight text-gray-200 line-clamp-1">{p.name[lang]}</h3>
-                                    <button onClick={() => setCart([...cart, p])} className="w-full py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-gray-400 hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all">ADD +</button>
+                                <div className="p-3">
+                                    <h3 className={`text-[11px] md:text-sm font-bold uppercase mb-2 leading-tight line-clamp-1 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{p.name[lang]}</h3>
+                                    {p.inStock ? (
+                                        <button onClick={() => setCart([...cart, p])} disabled={!isKitchenOpen} className={`w-full py-2 rounded-lg border text-[10px] font-black transition-all ${isDark ? 'bg-white/5 border-white/10 text-gray-400 hover:bg-orange-600 hover:text-white' : 'bg-black/5 border-black/5 text-gray-600 hover:bg-black hover:text-white'}`}>ADD +</button>
+                                    ) : (
+                                        <div className="text-[10px] text-red-500 font-bold text-center py-2 border border-red-500/20 rounded-lg bg-red-500/5">SOLD OUT</div>
+                                    )}
                                 </div>
                             </motion.div>
                         ))}
@@ -287,14 +330,14 @@ export default function Home() {
                 </main>
 
                 {/* DESKTOP CART */}
-                <aside className="hidden lg:block sticky top-24 bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-5 h-fit">
-                    <h3 className="font-black italic text-white mb-4">YOUR TRAY <span className="text-orange-500">({cart.length})</span></h3>
+                <aside className={`hidden lg:block sticky top-24 border rounded-[2rem] p-5 h-fit ${isDark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-black/10 shadow-lg'}`}>
+                    <h3 className="font-black italic mb-4">YOUR TRAY <span className="text-orange-500">({cart.length})</span></h3>
                     {cart.length > 0 && (
                         <div>
                             <div className="space-y-2 mb-4 max-h-[30vh] overflow-auto custom-scrollbar">
-                                {cart.map((c, i) => <div key={i} className="flex justify-between text-xs border-b border-white/5 pb-1"><span className="text-gray-400">{c.name.en}</span><span>₹{c.price}</span></div>)}
+                                {cart.map((c, i) => <div key={i} className="flex justify-between text-xs border-b border-gray-500/10 pb-1"><span className="opacity-70">{c.name.en}</span><span>₹{c.price}</span></div>)}
                             </div>
-                            <button onClick={() => setShowCheckout(true)} className="w-full bg-white text-black py-3 rounded-xl font-bold text-xs hover:bg-orange-500 hover:text-white transition-all">CHECKOUT ₹{cart.reduce((a,b)=>a+b.price, 0)}</button>
+                            <button onClick={() => setShowCheckout(true)} className="w-full bg-orange-600 text-white py-3 rounded-xl font-bold text-xs hover:scale-105 transition-all">CHECKOUT ₹{subtotal}</button>
                         </div>
                     )}
                 </aside>
@@ -307,50 +350,70 @@ export default function Home() {
                 <motion.div initial={{y:100}} animate={{y:0}} className="lg:hidden fixed bottom-6 left-4 right-4 z-40">
                     <button onClick={() => setShowCheckout(true)} className="w-full bg-orange-600 text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center">
                         <span className="font-bold text-[10px] uppercase bg-black/20 px-3 py-1 rounded-lg">{cart.length} Items</span>
-                        <span className="font-black text-lg italic">₹{cart.reduce((a,b)=>a+b.price, 0)} <span className="text-xs font-normal opacity-70 ml-1">Place Order </span></span>
+                        <span className="font-black text-lg italic">₹{subtotal} <span className="text-xs font-normal opacity-70 ml-1">Place Order </span></span>
                     </button>
                 </motion.div>
             )}
         </AnimatePresence>
 
-        {/* --- LIVE STATUS HUD (TIMER) --- */}
+        {/* --- LIVE STATUS HUD --- */}
         <AnimatePresence>
             {myOrder && !isAdmin && (
                 <motion.div drag dragConstraints={{top:0, bottom:0, left:0, right:0}} className="fixed top-20 right-4 z-[90] lg:right-10 cursor-grab active:cursor-grabbing">
                     <div className="bg-black/90 backdrop-blur-xl border border-orange-500/40 p-4 rounded-2xl shadow-[0_0_40px_rgba(234,88,12,0.2)] w-48">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-[9px] font-black text-orange-500 uppercase animate-pulse">● LIVE STATUS</span>
-                            <button onClick={()=>setMyOrder(null)} className="text-xs text-gray-600">✕</button>
+                            <span className="text-[9px] font-black text-orange-500 uppercase animate-pulse">● LIVE</span>
+                            <button onClick={()=>setMyOrder(null)} className="text-xs text-gray-400">✕</button>
                         </div>
                         <h3 className="text-2xl font-black text-white leading-none mb-1"><CountdownTimer targetDate={myOrder.targetTime} /></h3>
-                        <p className="text-[10px] text-gray-500">Estimated Ready Time</p>
                         <div className="mt-2 text-[10px] uppercase font-bold text-gray-300 bg-white/5 px-2 py-1 rounded text-center">Status: {myOrder.status}</div>
                     </div>
                 </motion.div>
             )}
         </AnimatePresence>
 
-        {/* --- CHECKOUT DRAWER (WITH SCANNER) --- */}
+        {/* --- CHECKOUT DRAWER --- */}
         <AnimatePresence>
             {showCheckout && (
-                <motion.div initial={{y:'100%'}} animate={{y:0}} exit={{y:'100%'}} className="fixed inset-0 z-[200] bg-[#050505] p-6 pt-12 overflow-y-auto lg:flex lg:items-center lg:justify-center lg:bg-black/90 lg:backdrop-blur-sm">
-                    <div className="lg:w-[400px] lg:bg-[#0a0a0a] lg:p-8 lg:rounded-[2.5rem] lg:border lg:border-white/10">
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-3xl font-black italic text-white">CONFIRM <span className="text-orange-500">DETAILS</span></h2>
+                <motion.div initial={{y:'100%'}} animate={{y:0}} exit={{y:'100%'}} className="fixed inset-0 z-[200] p-6 pt-12 overflow-y-auto lg:flex lg:items-center lg:justify-center bg-black/80 backdrop-blur-sm">
+                    <div className={`lg:w-[450px] p-8 rounded-[2.5rem] border ${isDark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-black/10'}`}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className={`text-3xl font-black italic ${isDark ? 'text-white' : 'text-black'}`}>CONFIRM <span className="text-orange-500">ORDER</span></h2>
                             <button onClick={() => setShowCheckout(false)} className="text-xs font-bold text-gray-500">CANCEL</button>
                         </div>
-                        <div className="space-y-5 mb-8">
-                            <div className="group"><label className="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Your Name</label><input type="text" value={userDetails.name} onChange={e=>setUserDetails({...userDetails, name:e.target.value})} className="w-full bg-[#111] border border-white/10 p-4 rounded-xl outline-none font-bold text-white focus:border-orange-500 transition-all text-sm" placeholder="e.g. Aashray" /></div>
-                            <div className="group"><label className="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Phone Number</label><input type="number" value={userDetails.phone} onChange={e=>setUserDetails({...userDetails, phone:e.target.value})} className="w-full bg-[#111] border border-white/10 p-4 rounded-xl outline-none font-bold text-white focus:border-orange-500 transition-all text-sm" placeholder="+91 987..." /></div>
+                        
+                        <div className="space-y-4 mb-6">
+                            <input type="text" value={userDetails.name} onChange={e=>setUserDetails({...userDetails, name:e.target.value})} className={`w-full border p-4 rounded-xl outline-none font-bold text-sm ${isDark ? 'bg-[#111] border-white/10 text-white' : 'bg-gray-50 border-black/10 text-black'}`} placeholder="Your Name" />
+                            <input type="number" value={userDetails.phone} onChange={e=>setUserDetails({...userDetails, phone:e.target.value})} className={`w-full border p-4 rounded-xl outline-none font-bold text-sm ${isDark ? 'bg-[#111] border-white/10 text-white' : 'bg-gray-50 border-black/10 text-black'}`} placeholder="Phone Number" />
                         </div>
-                        <div className="bg-white/5 p-5 rounded-2xl mb-6 border border-white/5 space-y-2">
-                            {cart.map((c, i) => (<div key={i} className="flex justify-between text-xs text-gray-400"><span>{c.name.en}</span><span>₹{c.price}</span></div>))}
-                            <div className="border-t border-white/10 pt-3 flex justify-between text-lg font-black text-white mt-1"><span>TOTAL</span><span>₹{cart.reduce((a,b)=>a+b.price, 0)}</span></div>
+
+                        {/* ADD-ONS SECTION */}
+                        <div className="mb-6">
+                            <p className="text-[10px] font-bold text-gray-500 uppercase mb-2">ADD EXTRAS</p>
+                            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                                {addonsData.map(ad => (
+                                    <div key={ad.id} className={`flex-shrink-0 p-4 rounded-2xl border text-center min-w-[120px] ${addons[ad.id] > 0 ? 'border-orange-500 bg-orange-500/10' : 'border-gray-500/20'}`}>
+                                        <p className="text-[10px] font-bold mb-1 opacity-70">{ad.name}</p>
+                                        <p className="text-sm font-black mb-2">₹{ad.price}</p>
+                                        <div className="flex justify-center gap-3 items-center">
+                                            <button onClick={() => setAddons({...addons, [ad.id]: Math.max(0, (addons[ad.id]||0)-1)})} className="text-xl font-bold opacity-50">-</button>
+                                            <span className="font-bold">{addons[ad.id]||0}</span>
+                                            <button onClick={() => setAddons({...addons, [ad.id]: (addons[ad.id]||0)+1})} className="text-xl font-bold text-orange-500">+</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className={`p-5 rounded-2xl mb-6 border space-y-2 ${isDark ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-black/5'}`}>
+                            {cart.map((c, i) => (<div key={i} className="flex justify-between text-xs opacity-70"><span>{c.name.en}</span><span>₹{c.price}</span></div>))}
+                            {Object.keys(addons).map(k => addons[k]>0 && <div key={k} className="flex justify-between text-xs text-orange-500"><span>{addonsData.find(a=>a.id===k).name} (x{addons[k]})</span><span>₹{addonsData.find(a=>a.id===k).price * addons[k]}</span></div>)}
+                            <div className="border-t border-gray-500/20 pt-3 flex justify-between text-lg font-black mt-1"><span>TOTAL</span><span>₹{subtotal}</span></div>
                         </div>
                         
                         <div className="space-y-3">
                             <button onClick={() => setShowScanner(true)} className="w-full bg-zinc-800 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest border border-white/10 flex items-center justify-center gap-2 animate-pulse hover:bg-zinc-700">📷 SCAN & PAY (UPI)</button>
-                            <button onClick={() => placeOrder('COD')} className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-200">PAY CASH ON DELIVERY</button>
+                            <button onClick={() => placeOrder('COD')} className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 shadow-lg">PAY CASH ON DELIVERY</button>
                             <button onClick={() => placeOrder('WA')} className="w-full bg-[#25D366] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:opacity-90">WHATSAPP ORDER</button>
                         </div>
                     </div>
