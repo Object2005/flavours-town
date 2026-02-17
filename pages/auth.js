@@ -60,7 +60,7 @@ export default function AuthPage() {
         className="w-full max-w-sm bg-white p-12 rounded-[4rem] shadow-2xl text-center border border-gray-100"
       >
         <h1 className="text-3xl font-black italic text-orange-600 uppercase tracking-tighter mb-2">The Flavours Town</h1>
-        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] mb-12">Login to your food kingdom</p>
+        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em] mb-12">Zomato Style Premium Access</p>
 
         <button 
           onClick={handleGoogleLogin}
@@ -68,11 +68,11 @@ export default function AuthPage() {
           className="w-full py-5 bg-white border-2 border-gray-100 hover:border-orange-600 rounded-[2rem] flex items-center justify-center gap-4 transition-all active:scale-95 shadow-sm"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-6 h-6" alt="Google" />
-          <span className="font-black text-sm uppercase tracking-widest">{loading ? 'Logging in...' : 'Sign in with Google'}</span>
+          <span className="font-black text-sm uppercase tracking-widest">{loading ? 'Connecting...' : 'Sign in with Google'}</span>
         </button>
 
         <p className="mt-10 text-[8px] font-black opacity-20 uppercase tracking-widest leading-loose">
-          No OTP, No Captcha, Just Flavor.<br/>Powered by Aashray Narang
+          Secure Login • Fast Delivery • Premium Taste<br/>By Aashray Narang
         </p>
       </motion.div>
     </div>
