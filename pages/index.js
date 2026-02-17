@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, push } from "firebase/database";
 
+// Firebase Config
 const firebaseConfig = { 
   apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", 
   authDomain: "flavourstown-83891.firebaseapp.com", 
@@ -19,124 +20,184 @@ const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
+  const [view, setView] = useState('menu'); // 'menu', 'cart', 'profile'
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
-  const [search, setSearch] = useState("");
-  const [lang, setLang] = useState('en'); // 'en' or 'pu'
-  const [activeCat, setActiveCat] = useState('All');
-  const [vegOnly, setVegOnly] = useState(true);
+  const [lang, setLang] = useState('en');
+  const [vegMode, setVegMode] = useState(true);
+
+  // Banners for Carousel (Based on Screenshot 11.44.29)
+  const banners = [
+    { id: 1, img: "https://b.zmtcdn.com/webFrontend/e5b8785c25163918ec062ba1ca08b1f31556085331.png", text: "Flat 50% OFF" },
+    { id: 2, img: "https://b.zmtcdn.com/webFrontend/7c53d539d91f1737f00d8329b350f58d1584438416.png", text: "Free Delivery" }
+  ];
 
   useEffect(() => {
-    setMounted(true);
-    const initAuth = async () => {
+    const init = async () => {
       await setPersistence(auth, browserLocalPersistence);
-      onAuthStateChanged(auth, (u) => { setUser(u); setLoading(false); });
+      onAuthStateChanged(auth, (u) => setUser(u));
     };
-    initAuth();
+    init();
     onValue(ref(db, 'menu'), (snap) => { if (snap.exists()) setMenu(Object.values(snap.val())); });
   }, []);
 
-  const filteredMenu = useMemo(() => {
-    return menu.filter(item => {
-      const nameStr = typeof item.name === 'object' ? (item.name.en + item.name.pu) : item.name;
-      const matchesSearch = nameStr.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = activeCat === 'All' || item.category === activeCat;
-      const matchesVeg = vegOnly ? item.isVeg !== false : true;
-      return matchesSearch && matchesCat && matchesVeg;
-    });
-  }, [menu, search, activeCat, vegOnly]);
+  const total = useMemo(() => cart.reduce((t, i) => t + i.price, 0), [cart]);
 
-  if (!mounted || loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin" /></div>;
+  const handleOrder = () => {
+    if (!user) return signInWithPopup(auth, provider);
+    const orderData = { user: user.displayName, items: cart, total, timestamp: Date.now() };
+    push(ref(db, 'orders'), orderData);
+    const msg = `*NEW ORDER - FT*%0A*Total:* ₹${total}%0A*Customer:* ${user.displayName}`;
+    window.open(`https://wa.me/919877474778?text=${msg}`);
+    setCart([]); setView('menu');
+  };
+
+  if (!user) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-white text-center">
+       <h1 className="text-4xl font-black italic text-orange-600 uppercase mb-8">Flavours Town</h1>
+       <button onClick={() => signInWithPopup(auth, provider)} className="w-full max-w-sm py-5 bg-black text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl">Continue with Google</button>
+    </div>
+  );
 
   return (
-    <div className={`min-h-screen bg-[#F8F8F8] text-black font-sans pb-40`}>
-      <Head><title>The Flavour's Town | Malout</title></Head>
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-orange-100">
+      <Head><title>Flavours Town Pro</title></Head>
 
-      {!user ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
-          <div className="w-20 h-20 bg-orange-600 rounded-3xl flex items-center justify-center text-white text-4xl font-black italic mb-6 shadow-2xl">FT</div>
-          <h1 className="text-3xl font-black uppercase italic tracking-tighter mb-8">Flavour's Town</h1>
-          <button onClick={() => signInWithPopup(auth, provider)} className="w-full max-w-xs py-5 bg-black text-white rounded-2xl font-black uppercase tracking-widest active:scale-95 transition-all">Continue with Google</button>
+      {/* --- HEADER --- */}
+      <header className="p-4 bg-white sticky top-0 z-50 border-b flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-orange-600">📍</span>
+          <div>
+            <p className="text-[9px] font-black text-gray-400 uppercase leading-none">Home • Malout ▾</p>
+            <h1 className="text-sm font-black tracking-tight">{view === 'cart' ? 'Yadvindra Garden' : 'Green Valley, Malout'}</h1>
+          </div>
         </div>
-      ) : (
-        <>
-          {/* HEADER SECTION (Based on Screenshot 11.44.29) */}
-          <header className="bg-white p-5 sticky top-0 z-50 border-b shadow-sm">
-            <div className="flex justify-between items-center mb-5">
-              <div className="flex items-center gap-2">
-                <span className="text-orange-600 text-xl">📍</span>
-                <div>
-                  <p className="text-[9px] font-black text-gray-400 uppercase leading-none">Home • Malout ▾</p>
-                  <h1 className="text-sm font-black tracking-tight">Green Valley, Punjab</h1>
-                </div>
+        <img src={user.photoURL} onClick={() => setView('profile')} className="w-10 h-10 rounded-full border-2 border-orange-500 cursor-pointer shadow-sm" />
+      </header>
+
+      {/* --- 1. MENU VIEW --- */}
+      {view === 'menu' && (
+        <div className="pb-32">
+          {/* CAROUSEL (Based on Screenshot 11.44.29) */}
+          <div className="p-4 overflow-x-auto flex gap-4 no-scrollbar">
+            {banners.map(b => (
+              <div key={b.id} className="min-w-[85%] h-44 bg-orange-600 rounded-[2.5rem] relative overflow-hidden shadow-lg">
+                 <img src={b.img} className="w-full h-full object-cover opacity-80" />
+                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent p-6 flex flex-col justify-center">
+                    <p className="text-white font-black text-3xl uppercase italic leading-none">{b.text}</p>
+                    <button className="mt-4 bg-white text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase w-fit">Order Now</button>
+                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setLang(lang === 'en' ? 'pu' : 'en')} className="text-[10px] font-black bg-gray-100 px-3 py-2 rounded-lg uppercase">{lang === 'en' ? 'ਪੰਜਾਬੀ' : 'English'}</button>
-                <img src={user.photoURL} className="w-10 h-10 rounded-full border-2 border-orange-500 shadow-md" />
-              </div>
-            </div>
-
-            {/* SEARCH & FILTERS */}
-            <div className="relative mb-5">
-              <input type="text" placeholder={lang === 'en' ? "Search 'Malai Chaap'..." : "ਮਲਾਈ ਚਾਪ ਲੱਭੋ..."} onChange={(e) => setSearch(e.target.value)} className="w-full bg-gray-100 border-none p-4 pl-12 rounded-2xl text-sm font-bold outline-none ring-1 ring-gray-200 focus:ring-orange-500 transition-all" />
-              <span className="absolute left-4 top-4 opacity-30 text-lg">🔍</span>
-            </div>
-
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-              {["All", "Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
-                <button key={cat} onClick={() => setActiveCat(cat)} className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all whitespace-nowrap border ${activeCat === cat ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-200'}`}>{cat}</button>
-              ))}
-            </div>
-          </header>
-
-          {/* VEG MODE TOGGLE */}
-          <div className="px-6 py-4 flex justify-between items-center bg-white mt-2 border-b">
-             <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-green-600 flex items-center justify-center"><div className="w-2 h-2 bg-green-600 rounded-full" /></div>
-                <span className="text-xs font-black uppercase tracking-tight">Veg Mode Only</span>
-             </div>
-             <button onClick={() => setVegOnly(!vegOnly)} className={`w-10 h-5 rounded-full transition-all relative ${vegOnly ? 'bg-green-600' : 'bg-gray-300'}`}>
-                <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${vegOnly ? 'right-1' : 'left-1'}`} />
-             </button>
+            ))}
           </div>
 
-          {/* MENU ENGINE (Fixed Object Error #31) */}
-          <main className="p-4 grid gap-6 max-w-2xl mx-auto">
-            <h2 className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Recommended Dishes</h2>
-            {filteredMenu.map((item, idx) => (
-              <motion.div layout key={idx} className="bg-white rounded-[2.5rem] p-5 border border-gray-100 flex justify-between items-center shadow-sm">
-                <div className="w-2/3 pr-4 text-left">
+          {/* VEG TOGGLE & CATEGORIES */}
+          <div className="px-5 py-4 flex justify-between items-center border-b">
+             <span className="text-xs font-black uppercase text-gray-400">Recommended for you</span>
+             <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-green-600">VEG MODE</span>
+                <button onClick={() => setVegMode(!vegMode)} className={`w-8 h-4 rounded-full relative ${vegMode ? 'bg-green-600' : 'bg-gray-300'}`}>
+                   <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${vegMode ? 'right-0.5' : 'left-0.5'}`} />
+                </button>
+             </div>
+          </div>
+
+          <main className="p-4 space-y-6">
+            {menu.map(item => (
+              <div key={item.id} className="bg-white rounded-[2rem] p-4 flex justify-between items-center border border-gray-100 shadow-sm">
+                <div className="w-2/3 pr-4">
                   <div className="w-3 h-3 border border-green-600 p-[1px] mb-2"><div className="w-full h-full bg-green-600 rounded-full" /></div>
-                  <h3 className="font-black text-base uppercase leading-tight italic">
-                    {typeof item.name === 'object' ? (lang === 'en' ? item.name.en : item.name.pu) : item.name}
-                  </h3>
-                  <p className="text-orange-600 font-black text-lg mt-1 tracking-tighter italic">₹{item.price}</p>
-                  <p className="text-[10px] text-gray-400 mt-2 line-clamp-2 leading-tight font-bold italic">Authentic taste of Malout, prepared with secret ingredients.</p>
+                  <h3 className="font-black text-sm uppercase leading-tight italic">{item.name?.en || item.name}</h3>
+                  <p className="text-orange-600 font-black text-sm mt-1">₹{item.price}</p>
                 </div>
                 <div className="relative">
-                  <img src={item.img} className="w-28 h-28 rounded-[2rem] object-cover shadow-inner border border-gray-50" />
-                  <button onClick={() => setCart([...cart, item])} className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-green-600 font-black px-6 py-2 rounded-xl shadow-xl border border-gray-100 text-[10px] uppercase active:scale-90 transition-all">Add <span className="text-[8px] align-top ml-1">+</span></button>
+                  <img src={item.img} className="w-24 h-24 rounded-2xl object-cover shadow-inner" />
+                  <button onClick={() => setCart([...cart, item])} className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-green-600 font-black px-5 py-2 rounded-xl shadow-lg border text-[9px] uppercase">Add +</button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </main>
 
-          {/* CHECKOUT BAR */}
-          <AnimatePresence>
-            {cart.length > 0 && (
-              <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-8 left-4 right-4 bg-orange-600 p-6 rounded-[2.5rem] flex justify-between items-center text-white shadow-[0_25px_60px_rgba(234,88,12,0.4)] z-[100] border-t border-orange-400">
-                <div className="italic">
-                   <p className="text-2xl font-black tracking-tighter leading-none">₹{cart.reduce((t, i) => t + i.price, 0)}</p>
-                   <p className="text-[9px] font-black uppercase opacity-60">{cart.length} Item Added</p>
+          {cart.length > 0 && (
+            <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="fixed bottom-6 left-4 right-4 bg-orange-600 p-5 rounded-2xl flex justify-between items-center text-white shadow-2xl z-[100]">
+              <div className="italic"><p className="text-2xl font-black leading-none">₹{total}</p><p className="text-[9px] font-bold opacity-60 uppercase">{cart.length} Item Added</p></div>
+              <button onClick={() => setView('cart')} className="bg-white text-orange-600 px-8 py-3 rounded-xl font-black text-[11px] uppercase italic tracking-widest">Next →</button>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* --- 2. CART VIEW (Based on Screenshot 11.49.27) --- */}
+      {view === 'cart' && (
+        <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} className="min-h-screen bg-gray-50 pb-40">
+          <div className="bg-white p-6 border-b flex items-center gap-4">
+            <button onClick={() => setView('menu')} className="text-xl">←</button>
+            <h2 className="text-xl font-black italic">Your Tray</h2>
+          </div>
+          
+          <div className="p-4 space-y-4">
+            <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-orange-100">
+               <p className="text-[9px] font-black text-green-600 uppercase mb-4 text-center">Mubarkan! You saved ₹144 on this order 🥳</p>
+               {cart.map((i, idx) => (
+                 <div key={idx} className="flex justify-between items-center py-3 border-b border-gray-50">
+                   <div><p className="font-black text-xs uppercase">{i.name?.en || i.name}</p><p className="text-xs font-bold text-gray-400">₹{i.price}</p></div>
+                   <div className="bg-orange-50 px-3 py-1 rounded-lg border border-orange-100 text-orange-600 font-black">1</div>
+                 </div>
+               ))}
+            </div>
+
+            <div className="p-2"><h3 className="text-[10px] font-black text-gray-400 uppercase italic">Complete your meal with</h3></div>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {[{n:"Gulab Jamun", p:70, i:"🍯"}, {n:"Roti", p:25, i:"🫓"}].map(r => (
+                <div key={r.n} className="min-w-[140px] bg-white p-5 rounded-3xl border text-center shadow-sm">
+                   <span className="text-3xl">{r.i}</span>
+                   <p className="text-[9px] font-black uppercase mt-2">{r.n}</p>
+                   <p className="text-xs font-bold text-orange-600">₹{r.p}</p>
                 </div>
-                <button className="bg-white text-orange-600 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest italic shadow-lg active:scale-95 transition-all">View Cart →</button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
+              ))}
+            </div>
+          </div>
+
+          <div className="fixed bottom-0 left-0 right-0 bg-white p-6 rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t">
+             <div className="flex justify-between items-end mb-6">
+                <div><p className="text-[8px] font-black opacity-30 uppercase italic">Payable Amount</p><p className="text-4xl font-black italic tracking-tighter leading-none">₹{total}</p></div>
+                <div className="text-right"><p className="text-[9px] font-black text-gray-400 uppercase leading-none">Using Google Pay UPI ▾</p></div>
+             </div>
+             <button onClick={handleOrder} className="w-full bg-green-600 text-white py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] italic shadow-xl">Place Order →</button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* --- 3. PROFILE VIEW (Based on Screenshot 11.44.11) --- */}
+      {view === 'profile' && (
+        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} className="min-h-screen bg-[#0d0d0d] text-white p-6">
+          <div className="flex justify-between items-center mb-10">
+            <button onClick={() => setView('menu')} className="text-2xl">←</button>
+            <h2 className="text-lg font-black uppercase tracking-tighter italic">My Profile</h2>
+            <div />
+          </div>
+
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative"><img src={user.photoURL} className="w-24 h-24 rounded-full border-4 border-orange-500 shadow-[0_0_20px_orange]" /><div className="absolute bottom-0 right-0 bg-green-600 p-2 rounded-full border-2 border-black">✎</div></div>
+            <h3 className="text-2xl font-black italic uppercase mt-4">{user.displayName}</h3>
+            <p className="text-xs font-bold opacity-40 uppercase tracking-widest">{user.email}</p>
+          </div>
+
+          <div className="space-y-4">
+             <div className="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 flex justify-between items-center">
+                <div className="flex items-center gap-3"><span>👑</span><p className="text-sm font-black italic uppercase">Gold member</p></div>
+                <div className="bg-orange-950 text-orange-400 px-3 py-1 rounded-full text-[9px] font-black uppercase">Saved ₹22</div>
+             </div>
+             {['Zomato Money', 'Your coupons', 'Address book', 'Your orders'].map(opt => (
+               <div key={opt} className="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-widest">{opt}</span>
+                  <span className="opacity-20">›</span>
+               </div>
+             ))}
+             <button onClick={() => auth.signOut()} className="w-full py-5 text-red-500 font-black uppercase text-xs tracking-widest mt-10">Logout Account</button>
+          </div>
+        </motion.div>
       )}
     </div>
   );
