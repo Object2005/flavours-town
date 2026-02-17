@@ -1,177 +1,142 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getDatabase, ref, onValue, update, remove, set } from "firebase/database";
 
 const firebaseConfig = { 
   apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", 
   authDomain: "flavourstown-83891.firebaseapp.com", 
   projectId: "flavourstown-83891", 
-  appId: "1:631949771733:web:16e025bbc443493242735c",
-  databaseURL: "https://flavourstown-83891-default-rtdb.firebaseio.com"
+  databaseURL: "https://flavourstown-83891-default-rtdb.firebaseio.com",
+  appId: "1:631949771733:web:16e025bbc443493242735c" 
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
 const db = getDatabase(app);
-const provider = new GoogleAuthProvider();
+const auth = getAuth(app);
 
-const INITIAL_MENU = [
-  { id: 1, name: "Malai Chaap", price: 100, img: "🍢", category: "Chaap" },
-  { id: 2, name: "Masala Chaap", price: 100, img: "🔥", category: "Chaap" },
-  { id: 4, name: "Paneer Tikka", price: 140, img: "🧀", category: "Snacks" },
-  { id: 7, name: "Pav Bhaji", price: 50, img: "🍞", category: "Snacks" },
-  { id: 8, name: "Cheese Chilli", price: 250, img: "🥘", category: "Chinese" },
-  { id: 11, name: "French Fries", price: 70, img: "🍟", category: "Sides" },
-  { id: 17, name: "Gulab Jamun", price: 20, img: "🍯", category: "Sweets" },
-  { id: 19, name: "Special Thali", price: 180, img: "🍱", category: "Main" }
-];
-
-export default function Home() {
+export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState('orders'); // orders, inventory, stats
   const [user, setUser] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [menu, setMenu] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [revenue, setRevenue] = useState(0);
 
-  // --- CONFIG DETAILS ---
-  const SHOP_PHONE = "919041113220"; // Replace with your number
-  const UPI_ID = "narangaashray34@okaxis"; // Replace with your UPI
-  const ADMIN_EMAIL = "narangaashray34@gmail.com"; 
-  // ----------------------
+  const ADMIN_EMAIL = "narangaashray34@gmail.com";
 
   useEffect(() => {
-    setMounted(true);
     onAuthStateChanged(auth, (u) => {
-      if (u) {
-        setUser(u);
-        if (u.email === ADMIN_EMAIL) setIsAdmin(true);
-      }
+      if (u && u.email === ADMIN_EMAIL) setUser(u);
     });
 
-    const menuRef = ref(db, 'menu');
-    onValue(menuRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setMenu(Object.values(data));
-      } else {
-        setMenu(INITIAL_MENU.map(item => ({ ...item, inStock: true })));
-      }
+    // 1. Live Orders & Sound Logic
+    onValue(ref(db, 'live_orders'), (snap) => {
+      if (snap.exists()) {
+        const data = Object.entries(snap.val()).map(([id, val]) => ({ id, ...val }));
+        setOrders(data);
+        // Sound Trigger for New Order
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3').play().catch(() => {});
+      } else setOrders([]);
+    });
+
+    // 2. Real-time Menu Sync
+    onValue(ref(db, 'menu'), (snap) => {
+      if (snap.exists()) setMenu(Object.entries(snap.val()).map(([id, val]) => ({ id, ...val })));
+    });
+
+    // 3. Revenue Calculator (Using a separate completed_orders ref for safety)
+    onValue(ref(db, 'daily_stats'), (snap) => {
+      if (snap.exists()) setRevenue(snap.val().totalSales || 0);
     });
   }, []);
 
-  const handleLogin = () => signInWithPopup(auth, provider);
-
-  const toggleStock = (id, currentStatus) => {
-    if (!isAdmin) return;
-    update(ref(db, `menu/${id}`), { inStock: !currentStatus });
+  const handleStatus = (order, status) => {
+    if (status === 'Served') {
+      // Add to Daily Revenue
+      const newTotal = revenue + order.total;
+      update(ref(db, 'daily_stats'), { totalSales: newTotal });
+      remove(ref(db, `live_orders/${order.id}`));
+    } else if (status === 'Cancelled') {
+      remove(ref(db, `live_orders/${order.id}`));
+    } else {
+      update(ref(db, `live_orders/${order.id}`), { status });
+    }
   };
 
-  const checkout = () => {
-    const total = cart.reduce((t, i) => t + i.price, 0);
-    const summary = cart.map(i => `• ${i.name}`).join('%0A');
-    const msg = `*NEW ORDER - FLAVOURS TOWN*%0A%0A*Items:*%0A${summary}%0A%0A*Total: ₹${total}*%0A*Customer:* ${user.displayName}`;
-    window.open(`https://wa.me/${SHOP_PHONE}?text=${msg}`, '_blank');
-  };
+  const toggleStock = (id, current) => update(ref(db, `menu/${id}`), { inStock: !current });
 
-  if (!mounted) return null;
+  if (!user) return <div className="h-screen flex items-center justify-center bg-black text-white font-black italic">ACCESS RESTRICTED 🛑</div>;
 
   return (
-    <div className="min-h-screen bg-[#FDFCF9] text-black font-sans selection:bg-orange-100">
-      <Head>
-        <title>Flavours Town | Sovereign Build</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-      </Head>
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
+      <Head><title>FT COMMANDER | MALOUT 👑</title></Head>
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-[100] bg-white/80 backdrop-blur-xl border-b p-5 flex justify-between items-center">
+      {/* --- TOP HUD (Stats) --- */}
+      <header className="p-6 bg-zinc-900 border-b border-white/10 flex justify-between items-center sticky top-0 z-[100]">
         <div>
-          <h1 className="text-xl font-black italic uppercase tracking-tighter text-orange-600">Flavours Town</h1>
-          <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Malout's Finest 📍</p>
+          <h1 className="text-2xl font-black italic text-orange-600 uppercase tracking-tighter leading-none">Command Center</h1>
+          <p className="text-[10px] font-bold opacity-30 uppercase mt-1 tracking-widest">Live Operations • Malout</p>
         </div>
-        {user ? (
-          <div className="flex items-center gap-3">
-            {isAdmin && <span className="text-[8px] bg-black text-white px-2 py-1 rounded-full font-black uppercase">Admin Mode</span>}
-            <img src={user.photoURL} className="w-8 h-8 rounded-full border-2 border-orange-500" />
-          </div>
-        ) : (
-          <button onClick={handleLogin} className="text-[10px] font-black uppercase border-b-2 border-black">Login</button>
-        )}
+        <div className="text-right">
+          <p className="text-[10px] font-black opacity-30 uppercase leading-none">Daily Revenue</p>
+          <p className="text-3xl font-black italic text-green-500 tracking-tighter">₹{revenue}</p>
+        </div>
+      </header>
+
+      {/* --- TAB NAVIGATION --- */}
+      <nav className="flex bg-zinc-900 border-b border-white/5 p-2 sticky top-[84px] z-[90]">
+        {['orders', 'inventory'].map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest italic transition-all ${activeTab === tab ? 'bg-orange-600 text-white rounded-xl' : 'opacity-30'}`}>
+            {tab === 'orders' ? `Live Orders (${orders.length})` : 'Manage Menu'}
+          </button>
+        ))}
       </nav>
 
-      <main className="p-6 max-w-2xl mx-auto pb-40">
-        <header className="mb-10">
-          <h2 className="text-5xl font-black italic uppercase tracking-tighter leading-none">Fresh <br/><span className="text-orange-600">Arrivals</span></h2>
-        </header>
-
-        <div className="grid gap-4">
-          {menu.map((item) => (
-            <motion.div layout key={item.id} className={`group bg-white p-5 rounded-[2.5rem] border transition-all ${!item.inStock ? 'opacity-40 grayscale' : 'hover:shadow-xl hover:border-orange-200'}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 bg-orange-50 rounded-3xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 transition-transform">{item.img}</div>
-                  <div>
-                    <h3 className="font-black text-sm uppercase tracking-tight">{item.name}</h3>
-                    <p className="text-orange-600 font-bold text-sm italic">₹{item.price}</p>
+      <main className="p-6 max-w-5xl mx-auto pb-40">
+        <AnimatePresence mode="wait">
+          {activeTab === 'orders' ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              {orders.length === 0 && <div className="py-20 text-center opacity-20 font-black italic uppercase">No orders currently...</div>}
+              {orders.map(order => (
+                <div key={order.id} className="bg-zinc-900 p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-4">
+                       <img src={order.photo} className="w-12 h-12 rounded-full border-2 border-orange-500" />
+                       <div><p className="font-black text-sm uppercase italic">{order.customer}</p><p className="text-[9px] opacity-40 uppercase">{order.time}</p></div>
+                    </div>
+                    <div className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${order.status === 'Ready' ? 'bg-green-600' : 'bg-orange-600'}`}>{order.status}</div>
+                  </div>
+                  <div className="space-y-2 mb-6 border-y border-white/5 py-4">
+                    {order.items.map((it, i) => (
+                      <p key={i} className="text-xs font-bold opacity-70 italic">• {it.name?.en || it.name}</p>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button onClick={() => handleStatus(order, 'Ready')} className="py-3 bg-white text-black rounded-xl font-black text-[9px] uppercase">Ready</button>
+                    <button onClick={() => handleStatus(order, 'Served')} className="py-3 bg-green-600 text-white rounded-xl font-black text-[9px] uppercase">Served</button>
+                    <button onClick={() => handleStatus(order, 'Cancelled')} className="py-3 bg-red-600/20 text-red-500 rounded-xl font-black text-[9px] uppercase border border-red-500/30">Cancel</button>
                   </div>
                 </div>
-                
-                {isAdmin ? (
-                  <button onClick={() => toggleStock(item.id, item.inStock)} className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase ${item.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {menu.map(item => (
+                <div key={item.id} className={`p-5 rounded-[2.5rem] border transition-all ${item.inStock ? 'bg-zinc-900 border-white/5' : 'bg-red-950/20 border-red-900/40 grayscale'}`}>
+                  <div className="text-3xl mb-3">{item.img}</div>
+                  <p className="font-black text-[11px] uppercase italic leading-none">{item.name?.en || item.name}</p>
+                  <p className="text-orange-500 font-bold text-xs mb-4 mt-1">₹{item.price}</p>
+                  <button onClick={() => toggleStock(item.id, item.inStock)} className={`w-full py-3 rounded-xl text-[9px] font-black uppercase ${item.inStock ? 'bg-white text-black' : 'bg-red-600 text-white'}`}>
                     {item.inStock ? 'In Stock' : 'Sold Out'}
                   </button>
-                ) : (
-                  <button 
-                    disabled={!item.inStock}
-                    onClick={() => { if(window.navigator.vibrate) window.navigator.vibrate(50); setCart([...cart, item]); }}
-                    className="bg-black text-white h-12 w-24 rounded-2xl font-black text-[10px] uppercase italic active:scale-90 transition-all disabled:bg-gray-200"
-                  >
-                    {item.inStock ? 'Add +' : 'Out'}
-                  </button>
-                )}
-              </div>
+                </div>
+              ))}
             </motion.div>
-          ))}
-        </div>
+          )}
+        </AnimatePresence>
       </main>
-
-      {/* Cart & Payment Section */}
-      <AnimatePresence>
-        {cart.length > 0 && (
-          <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-8 left-4 right-4 z-[150]">
-            <div className="bg-orange-600 rounded-[3rem] p-6 shadow-[0_20px_50px_rgba(234,88,12,0.4)] flex justify-between items-center text-white border-t border-orange-400">
-              <div>
-                <p className="text-[10px] font-black uppercase opacity-60 leading-none mb-1">{cart.length} Items Selected</p>
-                <p className="text-3xl font-black italic tracking-tighter">₹{cart.reduce((t, i) => t + i.price, 0)}</p>
-              </div>
-              <button onClick={() => setShowPayment(true)} className="bg-white text-orange-600 px-10 py-5 rounded-[2rem] font-black text-[11px] uppercase tracking-widest italic shadow-xl active:scale-95 transition-all">Checkout →</button>
-            </div>
-          </motion.div>
-        )}
-
-        {showPayment && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-            <div className="bg-white w-full max-w-sm rounded-[3.5rem] p-10 text-center relative">
-              <button onClick={() => setShowPayment(false)} className="absolute top-8 right-8 text-2xl font-light">×</button>
-              <h2 className="text-3xl font-black uppercase italic mb-2 tracking-tighter">Payment</h2>
-              <p className="text-orange-600 font-bold mb-8 italic">Pay ₹{cart.reduce((t, i) => t + i.price, 0)} to Place Order</p>
-              
-              <div className="bg-gray-50 p-6 rounded-[2.5rem] mb-8 inline-block border-2 border-dashed border-gray-200">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${UPI_ID}&pn=FlavoursTown&am=${cart.reduce((t, i) => t + i.price, 0)}&cu=INR`} 
-                  alt="UPI QR" className="w-48 h-48 mix-blend-multiply" 
-                />
-              </div>
-
-              <button onClick={checkout} className="w-full py-6 bg-green-600 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl active:scale-95 transition-all mb-4">Confirm & Order</button>
-              <p className="text-[8px] font-bold opacity-30 uppercase">Scan with GPay, PhonePe or Paytm</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
