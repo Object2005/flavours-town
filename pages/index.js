@@ -1,40 +1,78 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Components
 import Navbar from '../components/Navbar';
-import MenuCard from '../components/MenuCard';
-// ... baki imports same rehan gae
+import MenuGrid from '../components/MenuGrid';
+import CartDock from '../components/CartDock';
+import OrderTracker from '../components/OrderTracker';
 
 export default function Home() {
-  const [state, setState] = useState({ menu: [], cart: [], user: null, lang: 'EN', dark: false, search: '' });
+  const [user, setUser] = useState(null);
+  const [tab, setTab] = useState('home'); // home, orders, profile
+  const [cart, setCart] = useState([]);
 
-  // Filter logic hun separate hai, UI nu nahi chedega
-  const filteredMenu = useMemo(() => {
-    return state.menu.filter(item => 
-      item.name?.en.toLowerCase().includes(state.search.toLowerCase())
-    );
-  }, [state.menu, state.search]);
+  useEffect(() => {
+    const savedUser = localStorage.getItem('ft_user');
+    if (!savedUser) {
+      window.location.href = '/auth';
+    } else {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  if (!user) return <div className="h-screen flex items-center justify-center font-black italic animate-pulse text-orange-600">ENTERING THE TOWN...</div>;
 
   return (
-    <div className={state.dark ? 'dark bg-[#121212]' : 'bg-[#fcfbf7]'}>
-      <Navbar user={state.user} toggleSettings={() => {}} darkMode={state.dark} />
-      
-      <main className="pt-24 px-4 pb-32 max-w-4xl mx-auto">
-        {/* Search Bar Component */}
-        <input 
-          type="text" 
-          className="w-full p-5 rounded-3xl mb-8 border" 
-          onChange={(e) => setState({...state, search: e.target.value})} 
-          placeholder="Search..."
-        />
+    <div className="min-h-screen bg-[#fcfbf7] pb-32">
+      <Head><title>Flavours Town | Welcome {user.name}</title></Head>
 
-        {/* Menu Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {filteredMenu.map(p => (
-            <MenuCard key={p.id} item={p} lang={state.lang} onAdd={(item) => setState({...state, cart: [...state.cart, item]})} darkMode={state.dark} />
-          ))}
+      {/* 1. Professional Header */}
+      <header className="fixed top-0 w-full z-[100] bg-white/80 backdrop-blur-md p-5 border-b border-gray-100 flex justify-between items-center">
+        <div>
+          <p className="text-[8px] font-black uppercase opacity-30 tracking-[0.3em]">Ordering From</p>
+          <h2 className="text-sm font-black italic text-orange-600 uppercase">Malout, Punjab 📍</h2>
         </div>
+        <div className="text-right">
+          <p className="text-[8px] font-black uppercase opacity-30 tracking-[0.3em]">Town ID</p>
+          <p className="text-[10px] font-black uppercase bg-black text-white px-2 py-1 rounded-md tracking-tighter">{user.townId}</p>
+        </div>
+      </header>
+
+      {/* 2. Main Content Tabs */}
+      <main className="pt-24 px-5">
+        {tab === 'home' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+             <MenuGrid setCart={setCart} cart={cart} />
+          </motion.div>
+        )}
+        
+        {tab === 'orders' && (
+          <OrderTracker user={user} />
+        )}
       </main>
-      
-      {/* Footer/Cart Dock handle karo */}
+
+      {/* 3. Zomato Style Bottom Navigation */}
+      <nav className="fixed bottom-0 w-full bg-white border-t border-gray-100 p-6 flex justify-around items-center z-[200]">
+        {[
+          { id: 'home', icon: '🍔', label: 'Menu' },
+          { id: 'orders', icon: '🥡', label: 'Orders' },
+          { id: 'profile', icon: '👤', label: 'Profile' }
+        ].map((item) => (
+          <button 
+            key={item.id}
+            onClick={() => setTab(item.id)}
+            className={`flex flex-col items-center gap-1 transition-all ${tab === item.id ? 'scale-110 opacity-100' : 'opacity-20'}`}
+          >
+            <span className="text-2xl">{item.icon}</span>
+            <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* 4. Floating Cart System */}
+      <CartDock cart={cart} user={user} />
     </div>
   );
 }
