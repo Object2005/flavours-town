@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, push } from "firebase/database";
 
-// Firebase Config
 const firebaseConfig = { 
   apiKey: "AIzaSyA2tiCsoPmKV8U_yCXXSKq1wcL7Mdd2UCo", 
   authDomain: "flavourstown-83891.firebaseapp.com", 
@@ -12,7 +11,6 @@ const firebaseConfig = {
   appId: "1:631949771733:web:16e025bbc443493242735c" 
 };
 
-// Safe Init
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getDatabase(app);
 
@@ -22,54 +20,38 @@ export default function LuxuryCafe() {
   const [serving, setServing] = useState(0);
 
   useEffect(() => {
-    setMounted(true); // Hydration fix
-    
-    // Safe Menu Sync
-    const menuRef = ref(db, 'menu');
-    onValue(menuRef, (snap) => {
-      if(snap.exists()) {
-        const data = snap.val();
-        setMenu(data ? Object.values(data) : []);
-      }
-    });
-
-    // Safe Queue Sync
-    const queueRef = ref(db, 'queue/current');
-    onValue(queueRef, (snap) => {
-      if(snap.exists()) setServing(snap.val());
-    });
+    setMounted(true);
+    onValue(ref(db, 'menu'), (snap) => snap.exists() && setMenu(Object.values(snap.val())));
+    onValue(ref(db, 'queue/current'), (snap) => snap.exists() && setServing(snap.val()));
   }, []);
 
-  // Prevents Client-side exception by waiting for mount
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] text-[#1a1a1a] font-serif">
-      <Head><title>FT | The Royal Lounge</title></Head>
+    <div style={{ backgroundColor: '#faf9f6', minHeight: '100vh', color: '#1a1a1a', fontFamily: 'serif' }}>
+      <Head><title>The Flavour Town | Royal Lounge</title></Head>
       
-      <header className="p-10 flex flex-col items-center border-b border-black/5 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <p className="text-[10px] tracking-[0.5em] uppercase opacity-40 mb-2">Malout • Punjab</p>
-        <h1 className="text-4xl font-light italic tracking-widest uppercase">The Flavour Town</h1>
-        <div className="bg-[#d4af37] px-6 py-1.5 mt-4 rounded-full text-[10px] text-white font-sans font-bold tracking-widest">
-          NOW SERVING: #{serving}
+      <header style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+        <p style={{ fontSize: '10px', letterSpacing: '5px', textTransform: 'uppercase', opacity: 0.5 }}>Est. 2026 • Malout</p>
+        <h1 style={{ fontSize: '38px', fontWeight: '300', fontStyle: 'italic', letterSpacing: '4px', margin: '15px 0' }}>THE FLAVOUR TOWN</h1>
+        <div style={{ backgroundColor: '#d4af37', color: 'white', display: 'inline-block', padding: '5px 20px', borderRadius: '50px', fontSize: '11px', fontWeight: 'bold' }}>
+          SERVING SEQUENCE: #{serving}
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto p-8 space-y-24 pb-40">
-        {menu.length === 0 ? (
-          <p className="text-center italic opacity-20">Gathering Menu...</p>
-        ) : (
-          menu.map((item, idx) => (
-            <div key={idx} className="text-center group animate-in fade-in slide-in-from-bottom-4 duration-1000">
-              <div className="overflow-hidden rounded-sm shadow-2xl">
-                <img src={item.img} className="w-full h-[450px] object-cover transition-transform duration-1000 group-hover:scale-105" />
-              </div>
-              <h3 className="text-2xl mt-8 font-normal italic tracking-tight uppercase">{item.name}</h3>
-              <p className="text-xl text-[#d4af37] mt-2 font-light">₹{item.price}</p>
-              <button className="mt-6 border border-black px-12 py-3 text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">Reserve Experience</button>
+      <main style={{ maxWidth: '600px', margin: '0 auto', padding: '60px 20px' }}>
+        {menu.map((item, idx) => (
+          <div key={idx} style={{ marginBottom: '100px', textAlign: 'center' }}>
+            <div style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.1)', overflow: 'hidden', borderRadius: '4px' }}>
+              <img src={item.img} style={{ width: '100%', height: '450px', objectFit: 'cover' }} />
             </div>
-          ))
-        )}
+            <h3 style={{ fontSize: '24px', fontStyle: 'italic', marginTop: '30px', textTransform: 'uppercase', letterSpacing: '2px' }}>{item.name}</h3>
+            <p style={{ color: '#d4af37', fontSize: '20px', margin: '10px 0' }}>₹{item.price}</p>
+            <button style={{ backgroundColor: 'transparent', border: '1px solid #1a1a1a', padding: '10px 30px', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', cursor: 'pointer', marginTop: '10px' }}>
+              Reserve Experience
+            </button>
+          </div>
+        ))}
       </main>
     </div>
   );
