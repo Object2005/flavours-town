@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/aashraynarang/Documents/FOODWEBSITE/flavours-town/pages/_app.js"],"sourcesContent":["import '../styles/globals.css'; // Do dots (..) ka dhyaan rakhein\n\nexport default function App({ Component, pageProps }) {\n  return <Component {...pageProps} />;\n}"],"names":[],"mappings":";;;;;;;AAEe,SAAS,IAAI,EAAE,SAAS,EAAE,SAAS,EAAE;IAClD,qBAAO,qKAAC;QAAW,GAAG,SAAS;;;;;;AACjC"}}]
+}
