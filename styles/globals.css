@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
+  --color-brand-orange: #ff4d00;
+  --color-brand-amber: #ff8800;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes float-ember {
+  0% {
+    transform: translateY(105vh) translateX(0) scale(1) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-5vh) translateX(50px) scale(0.3) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-ember {
+  animation: float-ember 12s infinite linear;
+}

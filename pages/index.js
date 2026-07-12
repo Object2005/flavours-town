@@ -139,35 +139,48 @@ export default function Home() {
   };
 
   return (
-    <div className={`${isDark ? 'bg-black text-white' : 'bg-[#fcfbf7] text-black'} min-h-screen pb-44 transition-all duration-500 font-sans overflow-x-hidden`}>
+    <div className={`${isDark ? 'bg-gradient-to-b from-[#080808] via-[#0D0D0D] to-[#0A0A0A] text-white' : 'bg-gradient-to-b from-[#FAF8F5] via-[#FFFDFB] to-[#F7F4EF] text-black'} min-h-screen pb-44 transition-all duration-500 font-sans overflow-x-hidden relative`}>
       <Head>
         <title>98774-74778 | The Flavour's Town (PRO)</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
       </Head>
 
+      {/* GLOWING EMBERS BACKGROUND */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute w-2.5 h-2.5 rounded-full bg-brand-orange/30 blur-[1px] left-[10%] bottom-0 animate-ember" style={{ animationDelay: '0s', animationDuration: '10s' }} />
+        <div className="absolute w-1.5 h-1.5 rounded-full bg-brand-amber/40 blur-[1px] left-[25%] bottom-0 animate-ember" style={{ animationDelay: '2s', animationDuration: '14s' }} />
+        <div className="absolute w-2 h-2 rounded-full bg-brand-orange/20 blur-[1px] left-[45%] bottom-0 animate-ember" style={{ animationDelay: '4s', animationDuration: '12s' }} />
+        <div className="absolute w-1.5 h-1.5 rounded-full bg-brand-amber/35 blur-[1px] left-[65%] bottom-0 animate-ember" style={{ animationDelay: '1s', animationDuration: '15s' }} />
+        <div className="absolute w-2.5 h-2.5 rounded-full bg-brand-orange/25 blur-[1px] left-[80%] bottom-0 animate-ember" style={{ animationDelay: '6s', animationDuration: '11s' }} />
+        <div className="absolute w-2 h-2 rounded-full bg-brand-amber/30 blur-[1px] left-[90%] bottom-0 animate-ember" style={{ animationDelay: '3s', animationDuration: '13s' }} />
+      </div>
+
       {/* STICKY TOP HEADER */}
-      <header className={`fixed top-0 w-full z-[1000] px-4 py-4 backdrop-blur-3xl ${isDark ? 'bg-black/90 border-white/10 shadow-2xl' : 'bg-white/95 border-gray-200 shadow-xl'} border-b flex justify-between items-center`}>
+      <header className={`fixed top-0 w-full z-[1000] px-6 py-4 backdrop-blur-xl ${isDark ? 'bg-black/60 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.8)]' : 'bg-white/60 border-orange-100/50 shadow-[0_4px_30px_rgba(255,77,0,0.05)]'} border-b flex justify-between items-center transition-colors duration-300`}>
         <div className="flex items-center gap-4">
-          <div className="bg-orange-600 h-11 w-11 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg text-xl">FT</div>
+          <div className="bg-gradient-to-br from-brand-orange to-brand-amber h-11 w-11 rounded-2xl flex items-center justify-center text-white font-black italic shadow-[0_0_20px_rgba(255,77,0,0.4)] text-xl tracking-tighter">FT</div>
           <div className="flex flex-col leading-none">
-            <h1 className={`text-xs font-black uppercase tracking-tighter ${isDark ? 'text-white' : 'text-black'}`}>The Flavour's Town</h1>
-            <span className="text-[10px] font-black text-orange-500 animate-pulse">98774-74778</span>
+            <h1 className="text-sm font-black uppercase tracking-tight font-display">The Flavour's Town</h1>
+            <span className="text-[10px] font-black text-brand-orange flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 bg-brand-orange rounded-full animate-ping"></span>
+              98774-74778
+            </span>
           </div>
         </div>
         <div className="flex gap-2 items-center">
-          <button onClick={() => { haptic(); setIsDark(!isDark); }} className={`p-2.5 rounded-xl ${isDark ? 'bg-zinc-800 text-white' : 'bg-gray-100 text-black'}`}>{isDark ? '☀️' : '🌙'}</button>
-          <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[9px] font-black bg-orange-600 text-white px-4 py-2.5 rounded-xl uppercase shadow-lg">{lang === 'pu' ? 'EN' : 'ਪੰ'}</button>
-          <button onClick={() => { const p = prompt("Admin Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className="w-9 h-9 rounded-xl bg-orange-600/10 border border-orange-600/30 flex items-center justify-center text-orange-600 shadow-md font-black text-lg">⚙️</button>
+          <button onClick={() => { haptic(); setIsDark(!isDark); }} className={`p-2.5 rounded-2xl border transition-all duration-300 ${isDark ? 'bg-zinc-950/40 border-white/5 hover:border-white/10 text-yellow-500' : 'bg-white/40 border-orange-100/50 hover:border-orange-200 text-zinc-700 shadow-sm'}`}>{isDark ? '☀️' : '🌙'}</button>
+          <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[10px] font-black bg-gradient-to-r from-brand-orange to-brand-amber text-white px-4 py-2.5 rounded-2xl uppercase shadow-lg shadow-brand-orange/20 hover:brightness-110 active:scale-95 transition-all">{lang === 'pu' ? 'EN' : 'ਪੰ'}</button>
+          <button onClick={() => { const p = prompt("Admin Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-9 h-9 rounded-2xl flex items-center justify-center text-brand-orange border transition-all duration-300 ${isDark ? 'bg-brand-orange/5 border-brand-orange/10 hover:border-brand-orange/30' : 'bg-brand-orange/10 border-brand-orange/20 hover:border-brand-orange/40'} font-black text-lg`}>⚙️</button>
         </div>
       </header>
 
       {/* FILTER TABS */}
-      <nav className={`fixed top-[74px] w-full z-[900] py-4 backdrop-blur-md overflow-x-auto no-scrollbar flex gap-4 px-6 border-b ${isDark ? 'bg-black/80' : 'bg-white/90 shadow-md'}`}>
+      <nav className={`fixed top-[74px] w-full z-[900] py-4.5 backdrop-blur-md overflow-x-auto no-scrollbar flex gap-4 px-6 border-b transition-colors duration-300 ${isDark ? 'bg-black/40 border-white/5' : 'bg-white/40 border-orange-100/50'}`}>
         {["All", "Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
           <button 
             key={cat} 
             onClick={() => { haptic(); setActiveTab(cat); if(cat !== "All") scrollRefs.current[cat]?.scrollIntoView({behavior:'smooth', block:'start'}); }} 
-            className={`px-6 py-2 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all ${activeTab === cat ? 'bg-orange-600 text-white' : 'bg-orange-600/10 text-orange-500 border border-orange-600/30'}`}
+            className={`px-6 py-2 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all duration-300 ${activeTab === cat ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-lg shadow-brand-orange/20 border-transparent' : `border ${isDark ? 'bg-zinc-950/20 border-white/5 text-zinc-400 hover:border-white/10' : 'bg-white/30 border-orange-100/50 text-zinc-600 hover:border-orange-200'}`}`}
           >
             #{cat}
           </button>
@@ -175,46 +188,46 @@ export default function Home() {
       </nav>
 
       {/* SEARCH SYSTEM */}
-      <section className="pt-40 px-5 max-w-xl mx-auto">
-        <div className={`flex items-center px-7 py-5 rounded-[2.5rem] border-4 transition-all ${isDark ? 'bg-zinc-900 border-white/5 shadow-2xl' : 'bg-white border-orange-100 shadow-xl'}`}>
-           <span className="mr-4 text-2xl opacity-40">🔍</span>
-           <input type="text" value={searchQuery} placeholder={lang === 'pu' ? "ਤੁਹਾਨੂੰ ਅੱਜ ਕੀ ਪਸੰਦ ਹੈ?..." : "Search menu items..."} className={`bg-transparent border-none outline-none w-full text-base font-bold uppercase ${isDark ? 'text-white' : 'text-black'}`} onChange={(e) => setSearchQuery(e.target.value)} />
+      <section className="pt-44 px-5 max-w-xl mx-auto">
+        <div className={`flex items-center px-6 py-4.5 rounded-[2rem] border transition-all duration-300 focus-within:shadow-[0_0_30px_rgba(255,77,0,0.1)] ${isDark ? 'bg-zinc-950/40 border-white/5 focus-within:border-brand-orange/30' : 'bg-white/80 border-orange-100/70 focus-within:border-brand-orange/40 shadow-sm'}`}>
+           <span className="mr-3.5 text-xl opacity-50">🔍</span>
+           <input type="text" value={searchQuery} placeholder={lang === 'pu' ? "ਤੁਹਾਨੂੰ ਅੱਜ ਕੀ ਪਸੰਦ ਹੈ?..." : "Search menu items..."} className={`bg-transparent border-none outline-none w-full text-sm font-bold uppercase tracking-tight ${isDark ? 'text-white placeholder-zinc-600' : 'text-black placeholder-zinc-400'}`} onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
       </section>
 
       {/* GRID CONFIGURATION */}
-      <main className="mt-12 px-4 max-w-7xl mx-auto space-y-20 pb-64">
+      <main className="mt-12 px-4 max-w-7xl mx-auto space-y-24 pb-64 relative z-10">
         {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map((catName) => {
           const items = filteredItems.filter(i => i.category === catName);
           if (items.length === 0) return null;
           return (
-            <div key={catName} ref={el => scrollRefs.current[catName] = el} className="space-y-10 scroll-mt-48">
-              <div className="flex justify-between items-end border-b-4 border-orange-600/10 pb-4 px-2">
-                 <h2 className={`text-4xl font-black italic uppercase tracking-tighter ${isDark ? 'text-white' : 'text-black'}`}>{catName}</h2>
-                 <span className="text-[10px] font-black opacity-30 uppercase tracking-widest text-orange-600">Pure Taste</span>
+            <div key={catName} ref={el => scrollRefs.current[catName] = el} className="space-y-12 scroll-mt-48">
+              <div className="flex justify-between items-end border-b-2 border-brand-orange/10 pb-4 px-2">
+                 <h2 className="text-4xl font-black italic uppercase tracking-tight font-display bg-gradient-to-r from-brand-orange to-brand-amber bg-clip-text text-transparent">{catName}</h2>
+                 <span className="text-[10px] font-black opacity-40 uppercase tracking-widest text-brand-orange">Handcrafted Taste</span>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-10">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
                 {items.map((p) => (
-                  <motion.div initial={{opacity:0, scale:0.9}} whileInView={{opacity:1, scale:1}} viewport={{once:true}} key={p.id} className={`${isDark ? 'bg-zinc-900/80 border-white/10 shadow-2xl' : 'bg-white border-orange-100 shadow-lg'} rounded-[3.5rem] p-4 border relative group overflow-hidden transition-all ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
+                  <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true, margin:"-50px"}} key={p.id} className={`${isDark ? 'bg-zinc-950/40 border-white/5 shadow-2xl hover:border-brand-orange/20' : 'bg-white/80 border-orange-100/50 shadow-md hover:border-brand-orange/30'} rounded-[3rem] p-4 border relative group overflow-hidden transition-all duration-300 hover:scale-[1.02] ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
                     {isAdmin && (
-                        <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-orange-600 rounded-[3.5rem] p-4 text-center">
+                        <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-brand-orange rounded-[3rem] p-4 text-center">
                             <span className="text-3xl mb-2">{p.inStock ? '✅ Live' : '❌ Out'}</span>
-                            <span className="text-[10px] font-black uppercase">Toggle Stock</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider">Toggle Stock</span>
                         </button>
                     )}
-                    <div className="relative rounded-[2.5rem] overflow-hidden mb-5 h-40 bg-zinc-800 shadow-xl">
-                      <img src={p.img} className="w-full h-full object-cover" alt="" />
-                      <div className="absolute bottom-3 left-3 bg-orange-600 px-3 py-1 rounded-xl text-[9px] font-black text-white">⏱️ {prepTime}m</div>
-                      <div className="absolute top-3 right-3 bg-black/80 px-2.5 py-1 rounded-xl text-[10px] font-black text-yellow-400">⭐ {p.rating}</div>
+                    <div className="relative rounded-[2.2rem] overflow-hidden mb-4.5 h-38 md:h-44 bg-zinc-900 shadow-inner">
+                      <img src={p.img} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />
+                      <div className={`absolute bottom-3 left-3 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-white ${isDark ? 'bg-black/60' : 'bg-orange-600/90 shadow-sm'}`}>⏱️ {prepTime}m</div>
+                      <div className="absolute top-3 right-3 backdrop-blur-md bg-black/60 px-2.5 py-1 rounded-xl text-[9px] font-black text-yellow-400 flex items-center gap-1">⭐ {p.rating}</div>
                     </div>
-                    <div className="text-center">
-                      <h3 className={`text-[13px] font-black uppercase mb-1 h-12 flex items-center justify-center leading-none tracking-tighter italic ${isDark ? 'text-white' : 'text-black'}`}>{p.name[lang]}</h3>
-                      <p className="text-orange-500 font-black text-3xl mb-5   italic">₹{p.price}</p>
+                    <div className="text-center px-1">
+                      <h3 className="text-xs font-black uppercase mb-1 h-12 flex items-center justify-center leading-tight tracking-tight italic font-display">{p.name[lang]}</h3>
+                      <p className="text-brand-orange font-black text-2xl mb-4.5 italic tracking-tighter">₹{p.price}</p>
                       <button 
                         disabled={!isKitchenOpen || !p.inStock}
                         onClick={() => { haptic(); setShowCustomizer(p); }} 
-                        className={`w-full py-5 rounded-[2rem] text-[11px] font-black uppercase tracking-widest transition-all shadow-xl ${isKitchenOpen && p.inStock ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-gray-500'}`}
+                        className={`w-full py-4.5 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-95 shadow-md ${isKitchenOpen && p.inStock ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-brand-orange/10 hover:brightness-110' : `${isDark ? 'bg-zinc-900/60 border border-white/5 text-zinc-500' : 'bg-gray-200/60 text-zinc-400'}`}`}
                       >
                         {!p.inStock ? 'SOLD OUT' : isKitchenOpen ? 'Customize' : 'CLOSED'}
                       </button>
@@ -230,16 +243,16 @@ export default function Home() {
       {/* FLOATING ACTION CART BAR */}
       <AnimatePresence>
         {subtotal > 0 && !orderStatus && (
-          <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-8 left-0 right-0 z-[1000] px-6">
-            <button onClick={() => { haptic(); setShowCheckout(true); }} className={`w-full max-w-lg mx-auto p-5 rounded-[2.5rem] shadow-2xl flex justify-between items-center border-2 border-orange-600/20 ${isDark ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
-               <div className="flex items-center gap-5 italic ml-3">
-                  <div className="bg-orange-600 h-12 w-12 rounded-2xl flex items-center justify-center text-3xl text-white font-black animate-bounce">🛒</div>
-                  <div className="text-left">
-                    <p className="text-[10px] font-black uppercase opacity-40 leading-none">Total Items: {cart.length}</p>
-                    <p className="text-4xl font-black tracking-tighter">₹{subtotal}</p>
+          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 left-0 right-0 z-[1000] px-6">
+            <button onClick={() => { haptic(); setShowCheckout(true); }} className={`w-full max-w-lg mx-auto p-4.5 rounded-[2.5rem] shadow-[0_15px_50px_rgba(255,77,0,0.2)] flex justify-between items-center border transition-all duration-300 ${isDark ? 'bg-white/95 text-black border-white/20 hover:bg-white' : 'bg-zinc-950/95 text-white border-zinc-800/80 hover:bg-zinc-950'}`}>
+               <div className="flex items-center gap-4 italic ml-3">
+                  <div className="bg-gradient-to-br from-brand-orange to-brand-amber h-12 w-12 rounded-2xl flex items-center justify-center text-2xl text-white font-black animate-bounce shadow-md">🛒</div>
+                  <div className="text-left leading-tight">
+                    <p className="text-[9px] font-black uppercase opacity-50 tracking-wider">Total Items: {cart.length}</p>
+                    <p className="text-3xl font-black tracking-tight font-display">₹{subtotal}</p>
                   </div>
                </div>
-               <div className={`px-10 py-4 rounded-[1.8rem] font-black text-[12px] uppercase shadow-2xl tracking-widest ${isDark ? 'bg-gray-900 text-white' : 'bg-orange-600 text-white'}`}>Review Bill →</div>
+               <div className={`px-8 py-3.5 rounded-[1.8rem] font-black text-[11px] uppercase tracking-widest transition-all ${isDark ? 'bg-zinc-950 text-white hover:bg-zinc-900' : 'bg-gradient-to-r from-brand-orange to-brand-amber text-white hover:brightness-115'}`}>Review Bill →</div>
             </button>
           </motion.div>
         )}
@@ -248,21 +261,21 @@ export default function Home() {
       {/* MASTER CONSOLE PANEL */}
       <AnimatePresence>
         {isAdmin && (
-          <motion.div initial={{y:-300}} animate={{y:0}} exit={{y:-300}} className="fixed top-24 left-4 right-4 z-[1100] bg-[#fdfbf7] p-8 rounded-[4rem] shadow-2xl text-gray-900 border-4 border-orange-200">
-            <h3 className="text-2xl font-black uppercase italic text-orange-600 mb-6 border-b pb-2">Master Admin Panel</h3>
-            <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white p-5 rounded-[2.5rem] shadow-sm">
-                    <p className="text-[11px] font-black uppercase mb-3 opacity-40 text-center">Store Status</p>
-                    <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`w-full py-4 rounded-2xl font-black text-[12px] uppercase ${isKitchenOpen ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
+          <motion.div initial={{y:-300, opacity:0}} animate={{y:0, opacity:1}} exit={{y:-300, opacity:0}} className={`fixed top-24 left-4 right-4 z-[1100] p-7 rounded-[3rem] shadow-2xl border backdrop-blur-2xl transition-colors duration-300 ${isDark ? 'bg-zinc-950/90 border-brand-orange/20 text-white' : 'bg-white/95 border-orange-200 text-gray-900'}`}>
+            <h3 className="text-xl font-black uppercase italic text-brand-orange mb-5 border-b border-brand-orange/10 pb-2.5 font-display">Master Admin Panel</h3>
+            <div className="grid grid-cols-2 gap-4">
+                <div className={`p-4.5 rounded-[2rem] border ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50 border-orange-100/50'} text-center shadow-sm`}>
+                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider">Store Status</p>
+                    <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`w-full py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-wider transition-all duration-200 active:scale-95 ${isKitchenOpen ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>
                         {isKitchenOpen ? 'Close Kitchen' : 'Open Kitchen'}
                     </button>
                 </div>
-                <div className="bg-white p-5 rounded-[2.5rem] shadow-sm text-center">
-                    <p className="text-[11px] font-black uppercase mb-3 opacity-40 text-center">Prep Duration</p>
+                <div className={`p-4.5 rounded-[2rem] border ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50 border-orange-100/50'} text-center shadow-sm`}>
+                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider">Prep Duration</p>
                     <div className="flex items-center justify-between px-2">
-                        <button onClick={()=>setPrepTime(p=>Math.max(5,p-5))} className="w-8 h-8 bg-orange-100 rounded-full font-black text-orange-600">-</button>
-                        <span className="text-xl font-black">{prepTime}m</span>
-                        <button onClick={()=>setPrepTime(p=>p+5)} className="w-8 h-8 bg-orange-100 rounded-full font-black text-orange-600">+</button>
+                        <button onClick={()=>setPrepTime(p=>Math.max(5,p-5))} className="w-8 h-8 bg-brand-orange/10 rounded-full font-black text-brand-orange hover:bg-brand-orange/20 active:scale-90 transition-all">-</button>
+                        <span className="text-lg font-black font-display">{prepTime}m</span>
+                        <button onClick={()=>setPrepTime(p=>p+5)} className="w-8 h-8 bg-brand-orange/10 rounded-full font-black text-brand-orange hover:bg-brand-orange/20 active:scale-90 transition-all">+</button>
                     </div>
                 </div>
             </div>
@@ -273,52 +286,52 @@ export default function Home() {
       {/* CHECKOUT PORTAL MODAL */}
       <AnimatePresence>
         {showCheckout && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[2000] flex items-end justify-center p-4">
-             <motion.div initial={{y:500}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950 border-white/10' : 'bg-white'} w-full rounded-[4rem] p-8 max-w-2xl overflow-y-auto max-h-[90vh] border-t-4 border-orange-600`}>
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-3xl font-black uppercase italic text-orange-600">Review Summary</h2>
-                  <button onClick={() => setShowCheckout(false)} className="bg-red-600 text-white w-10 h-10 rounded-full font-black">✕</button>
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] flex items-end justify-center p-4">
+             <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950/95 border-white/5' : 'bg-white border-orange-100'} w-full border rounded-[3rem] p-7 max-w-2xl overflow-y-auto max-h-[85vh] shadow-2xl relative`}>
+                <div className="flex justify-between items-center mb-6 border-b border-brand-orange/10 pb-4">
+                  <h2 className="text-2xl font-black uppercase italic text-brand-orange font-display">Your Basket</h2>
+                  <button onClick={() => setShowCheckout(false)} className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white w-9 h-9 rounded-full font-black flex items-center justify-center transition-all">✕</button>
                 </div>
                 
-                <div className="space-y-4 mb-8 max-h-60 overflow-y-auto pr-2">
+                <div className="space-y-3 mb-6 max-h-52 overflow-y-auto pr-2 no-scrollbar">
                   {cart.map((c) => (
-                    <div key={c.cartId} className="flex justify-between items-center border-b border-orange-600/10 pb-4">
+                    <div key={c.cartId} className={`flex justify-between items-center border p-4.5 rounded-[1.8rem] transition-colors ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50/50 border-orange-50/50'}`}>
                        <div className="text-left">
-                         <p className="text-lg font-black uppercase">{c.name[lang]}</p>
-                         <p className="text-xs text-orange-500 font-bold">{c.spice} Mode</p>
+                         <p className="text-sm font-black uppercase tracking-tight">{c.name[lang]}</p>
+                         <p className="text-[9px] text-brand-orange font-black uppercase tracking-widest mt-0.5">{c.spice} spice</p>
                        </div>
                        <div className="flex items-center gap-4">
-                         <p className="font-black text-xl">₹{c.price}</p>
-                         <button onClick={() => removeFromCart(c.cartId)} className="text-red-500 text-xs font-black bg-red-500/10 px-2 py-1 rounded-md">Delete</button>
+                         <p className="font-black text-lg font-display">₹{c.price}</p>
+                         <button onClick={() => removeFromCart(c.cartId)} className="text-red-500 text-[9px] font-black bg-red-500/10 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-xl uppercase tracking-wider transition-all">Delete</button>
                        </div>
                     </div>
                   ))}
                 </div>
 
                 {/* ADDONS CONTROLLER */}
-                <h3 className="text-sm font-black uppercase opacity-40 mb-4 tracking-wider">Suggested Addons</h3>
-                <div className="grid grid-cols-3 gap-2 mb-8">
+                <h3 className="text-[10px] font-black uppercase opacity-50 mb-3 tracking-widest text-brand-orange">Enhance Your Plate</h3>
+                <div className="grid grid-cols-3 gap-3 mb-6">
                    {addonsData.map(a => (
-                     <div key={a.id} className={`${isDark ? 'bg-zinc-900' : 'bg-gray-100'} p-3 rounded-2xl text-center`}>
-                        <p className="text-xs font-black truncate">{a.name[lang]}</p>
-                        <p className="text-sm font-bold text-orange-500 mb-2">₹{a.price}</p>
-                        <div className="flex justify-between items-center bg-black/30 rounded-lg p-1">
-                          <button onClick={() => setAddons({...addons, [a.id]: Math.max(0, (addons[a.id] || 0) - 1)})} className="text-orange-500 font-bold px-2">-</button>
-                          <span className="text-xs font-bold text-white">{addons[a.id] || 0}</span>
-                          <button onClick={() => setAddons({...addons, [a.id]: (addons[a.id] || 0) + 1})} className="text-orange-500 font-bold px-2">+</button>
+                     <div key={a.id} className={`${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50/50 border-orange-50/50'} border p-3 rounded-2xl text-center shadow-sm`}>
+                        <p className="text-[10px] font-black truncate uppercase tracking-tight">{a.name[lang]}</p>
+                        <p className="text-xs font-black text-brand-orange mb-2 font-display">+₹{a.price}</p>
+                        <div className={`flex justify-between items-center rounded-xl p-1 ${isDark ? 'bg-zinc-950/80' : 'bg-gray-200/50'}`}>
+                          <button onClick={() => setAddons({...addons, [a.id]: Math.max(0, (addons[a.id] || 0) - 1)})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">-</button>
+                          <span className="text-[10px] font-black">{addons[a.id] || 0}</span>
+                          <button onClick={() => setAddons({...addons, [a.id]: (addons[a.id] || 0) + 1})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">+</button>
                         </div>
                      </div>
                    ))}
                 </div>
 
-                <div className="flex justify-between items-center mb-8 border-t pt-4">
-                   <p className="text-xs font-black uppercase tracking-widest opacity-40">Amount Due</p>
-                   <p className="text-5xl font-black text-orange-600">₹{subtotal}</p>
+                <div className="flex justify-between items-center mb-6 border-t border-brand-orange/10 pt-4 px-2">
+                   <p className="text-[9px] font-black uppercase tracking-widest opacity-50">Total Bill</p>
+                   <p className="text-4xl font-black text-brand-orange font-display">₹{subtotal}</p>
                 </div>
 
-                <div className="space-y-4">
-                   <button onClick={() => processOrder('UPI')} className="w-full bg-[#1A73E8] text-white py-4 rounded-2xl font-black uppercase flex items-center justify-center gap-4">💳 UPI INSTANT PAY</button>
-                   <button onClick={() => processOrder('WA')} className="w-full bg-[#25D366] text-white py-4 rounded-2xl font-black uppercase flex items-center justify-center gap-4">📱 WHATSAPP ROUTE</button>
+                <div className="grid grid-cols-2 gap-4">
+                   <button onClick={() => processOrder('UPI')} className="bg-[#1A73E8] hover:bg-[#1557b0] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 transition-all duration-200 active:scale-95">💳 UPI INSTANT</button>
+                   <button onClick={() => processOrder('WA')} className="bg-[#25D366] hover:bg-[#20ba59] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-green-500/10 transition-all duration-200 active:scale-95">📱 WHATSAPP</button>
                 </div>
              </motion.div>
           </motion.div>
@@ -328,19 +341,19 @@ export default function Home() {
       {/* LIVE ITEM CUSTOMIZER DRAWER */}
       <AnimatePresence>
         {showCustomizer && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[3000] flex items-end justify-center p-4">
-            <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950' : 'bg-white'} w-full rounded-[3rem] p-8 max-w-md border-t-8 border-orange-600 shadow-2xl`}>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-black uppercase tracking-tight">{showCustomizer.name[lang]}</h2>
-                <button onClick={() => setShowCustomizer(null)} className="text-gray-500 font-black">✕</button>
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/80 backdrop-blur-md z-[3000] flex items-end justify-center p-4">
+            <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950/95 border-white/5' : 'bg-white border-orange-100'} w-full border rounded-[3rem] p-7 max-w-md shadow-2xl relative`}>
+              <div className="flex justify-between items-center mb-5 border-b border-brand-orange/10 pb-3.5">
+                <h2 className="text-xl font-black uppercase tracking-tight italic font-display">{showCustomizer.name[lang]}</h2>
+                <button onClick={() => setShowCustomizer(null)} className="text-gray-500 font-bold hover:text-red-500 transition-all">✕</button>
               </div>
-              <p className="text-xs uppercase font-black tracking-widest opacity-40 mb-3">Select Spice Profile</p>
-              <div className="flex gap-4 mb-8">
+              <p className="text-[10px] uppercase font-black tracking-widest opacity-50 mb-3.5 text-brand-orange">Choose Spice Level</p>
+              <div className="flex gap-3.5 mb-7">
                 {['Low', 'Medium', 'High'].map(spice => (
-                  <button key={spice} onClick={() => setCustomOptions({spice})} className={`flex-1 py-3 rounded-xl font-black text-sm border-2 transition-all ${customOptions.spice === spice ? 'bg-orange-600 border-orange-600 text-white scale-105' : 'border-zinc-800 text-gray-500'}`}>{spice}</button>
+                  <button key={spice} onClick={() => setCustomOptions({spice})} className={`flex-1 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider border-2 transition-all duration-200 active:scale-95 ${customOptions.spice === spice ? 'bg-gradient-to-r from-brand-orange to-brand-amber border-transparent text-white shadow-lg shadow-brand-orange/15 scale-105' : `${isDark ? 'border-zinc-800 text-zinc-500 hover:border-zinc-700' : 'border-gray-200 text-zinc-600 hover:border-gray-300'}`}`}>{spice}</button>
                 ))}
               </div>
-              <button onClick={() => { haptic(); addToCart(showCustomizer, customOptions); setShowCustomizer(null); }} className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase shadow-xl tracking-wider">Add to Basket</button>
+              <button onClick={() => { haptic(); addToCart(showCustomizer, customOptions); setShowCustomizer(null); }} className="w-full bg-gradient-to-r from-brand-orange to-brand-amber text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-brand-orange/15 tracking-widest hover:brightness-110 active:scale-95 transition-all">Add to Basket</button>
             </motion.div>
           </motion.div>
         )}
@@ -350,18 +363,18 @@ export default function Home() {
       <AnimatePresence>
         {orderStatus && (
           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/95 z-[5000] flex flex-col items-center justify-center p-6 text-center">
-             <motion.div animate={{ scale:[1, 1.2, 1], rotate:[0, 10, -10, 0] }} transition={{repeat:Infinity, duration:2}} className="text-9xl mb-8">🥘</motion.div>
-             <h2 className="text-6xl font-black uppercase text-orange-600 mb-2">COOKING MEAL</h2>
-             <p className="text-sm text-gray-500 mb-8 max-w-xs uppercase font-black opacity-60">Preparing your order and parsing data vectors...</p>
-             <div className="w-64 h-3 bg-zinc-900 rounded-full overflow-hidden border border-white/10 relative">
-                <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-orange-600 rounded-full"></motion.div>
+             <motion.div animate={{ scale:[1, 1.15, 1], rotate:[0, 8, -8, 0] }} transition={{repeat:Infinity, duration:2.5, ease:"easeInOut"}} className="text-9xl mb-8 filter drop-shadow-[0_0_35px_rgba(255,77,0,0.5)]">🥘</motion.div>
+             <h2 className="text-4xl font-black uppercase text-brand-orange mb-2 font-display tracking-tight italic">Roasting in Tandoor...</h2>
+             <p className="text-[10px] text-zinc-500 mb-8 max-w-xs uppercase font-black tracking-widest opacity-75">Getting spices and heat synced by the chef</p>
+             <div className="w-60 h-2 bg-zinc-900 rounded-full overflow-hidden border border-white/5 relative shadow-inner">
+                <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-gradient-to-r from-brand-orange to-brand-amber rounded-full shadow-[0_0_10px_rgba(255,77,0,0.8)]"></motion.div>
              </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* COMPACT FOOTER */}
-      <footer className="mt-40 text-center opacity-30 text-xs font-black uppercase tracking-widest">
+      <footer className="mt-40 text-center opacity-30 text-[9px] font-black uppercase tracking-widest pb-12">
         <p>© 2026 The Flavour's Town | Developed by Aashray Narang</p>
       </footer>
     </div>
