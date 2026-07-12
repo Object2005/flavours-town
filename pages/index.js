@@ -31,6 +31,13 @@ const addonsData = [
   { id: 'p1', name: { en: "Packing Charge", pu: "ਪੈਕਿੰਗ" }, price: 10 }
 ];
 
+const storiesData = [
+  { id: 1, title: { en: "Tandoor Fire", pu: "ਤੰਦੂਰ ਲਾਈਵ" }, img: "/img/afghani-chaap.jpg", highlight: "Fresh hot tandoori roasting every evening." },
+  { id: 2, title: { en: "Malai Special", pu: "ਮਲਾਈ ਸਪੈਸ਼ਲ" }, img: "/img/malai-chaap.jpg", highlight: "Rich creamy cashew marination." },
+  { id: 3, title: { en: "Paneer Feast", pu: "ਪਨੀਰ ਫੀਸਟ" }, img: "/img/paneer-tikka.jpg", highlight: "Soft tandoori marinated paneer cubes." },
+  { id: 4, title: { en: "Roll Mania", pu: "ਰੋਲ ਮੇਨੀਆ" }, img: "/img/paneer-roll.jpg", highlight: "Crispy flaky Rumali rolls packed with flavour." }
+];
+
 export default function Home() {
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState([]);
@@ -46,8 +53,25 @@ export default function Home() {
   const [cookingProgress, setCookingProgress] = useState(0);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showCustomizer, setShowCustomizer] = useState(null);
-  const [customOptions, setCustomOptions] = useState({ spice: 'Medium' });
+  const [customOptions, setCustomOptions] = useState({ spice: 2 }); // Convert to index-based for slider: 1=Low, 2=Medium, 3=High
   const [sessionOrderId, setSessionOrderId] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeStory, setActiveStory] = useState(null);
+  const [flyingParticles, setFlyingParticles] = useState([]);
+  const [themeTransition, setThemeTransition] = useState(null);
+
+  const handleThemeToggle = (e) => {
+    haptic();
+    const x = e.clientX || window.innerWidth - 40;
+    const y = e.clientY || 40;
+    setThemeTransition({ x, y, toDark: !isDark });
+    setTimeout(() => {
+      setIsDark(!isDark);
+    }, 300);
+    setTimeout(() => {
+      setThemeTransition(null);
+    }, 600);
+  };
 
   const scrollRefs = useRef({});
 
@@ -65,6 +89,9 @@ export default function Home() {
 
     const savedPrep = localStorage.getItem('ft_final_prep');
     if (savedPrep) setPrepTime(parseInt(savedPrep));
+
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   // Sync to LocalStorage safely when state updates
@@ -102,7 +129,25 @@ export default function Home() {
 
   // Cart Management
   const addToCart = (item, options) => {
-    setCart(prev => [...prev, { ...item, cartId: `${item.id}-${Date.now()}`, ...options }]);
+    const spiceLevels = { 1: 'Low', 2: 'Medium', 3: 'High' };
+    const spiceText = spiceLevels[options.spice] || 'Medium';
+    setCart(prev => [...prev, { ...item, cartId: `${item.id}-${Date.now()}`, spice: spiceText }]);
+  };
+
+  const handleAddToBasket = (e) => {
+    haptic();
+    try {
+      new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3').play();
+    } catch(err){}
+    const startX = e.clientX || window.innerWidth / 2;
+    const startY = e.clientY || window.innerHeight / 2;
+    const particleId = Date.now();
+    setFlyingParticles(prev => [...prev, { id: particleId, x: startX, y: startY }]);
+    setTimeout(() => {
+      setFlyingParticles(prev => prev.filter(p => p.id !== particleId));
+    }, 800);
+    addToCart(showCustomizer, customOptions);
+    setShowCustomizer(null);
   };
 
   const removeFromCart = (cartId) => {
@@ -168,7 +213,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex gap-2 items-center">
-          <button onClick={() => { haptic(); setIsDark(!isDark); }} className={`p-2.5 rounded-2xl border transition-all duration-300 ${isDark ? 'bg-zinc-950/40 border-white/5 hover:border-white/10 text-yellow-500' : 'bg-white/40 border-orange-100/50 hover:border-orange-200 text-zinc-700 shadow-sm'}`}>{isDark ? '☀️' : '🌙'}</button>
+  <button onClick={(e) => handleThemeToggle(e)} className={`p-2.5 rounded-2xl border transition-all duration-300 ${isDark ? 'bg-zinc-950/40 border-white/5 hover:border-white/10 text-yellow-500' : 'bg-white/40 border-orange-100/50 hover:border-orange-200 text-zinc-700 shadow-sm'}`}>{isDark ? '☀️' : '🌙'}</button>
           <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[10px] font-black bg-gradient-to-r from-brand-orange to-brand-amber text-white px-4 py-2.5 rounded-2xl uppercase shadow-lg shadow-brand-orange/20 hover:brightness-110 active:scale-95 transition-all">{lang === 'pu' ? 'EN' : 'ਪੰ'}</button>
           <button onClick={() => { const p = prompt("Admin Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-9 h-9 rounded-2xl flex items-center justify-center text-brand-orange border transition-all duration-300 ${isDark ? 'bg-brand-orange/5 border-brand-orange/10 hover:border-brand-orange/30' : 'bg-brand-orange/10 border-brand-orange/20 hover:border-brand-orange/40'} font-black text-lg`}>⚙️</button>
         </div>
@@ -195,8 +240,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* STORIES ROW */}
+      <section className="mt-8 px-6 max-w-xl mx-auto overflow-x-auto no-scrollbar flex gap-5 py-2 z-10 relative">
+        {storiesData.map((story, idx) => (
+          <button key={story.id} onClick={() => { haptic(); setActiveStory(idx); }} className="flex flex-col items-center gap-1.5 focus:outline-none shrink-0 group">
+            <div className="w-16 h-16 rounded-full p-[3px] bg-gradient-to-tr from-brand-orange to-brand-amber shadow-md group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-full border border-black overflow-hidden bg-zinc-900">
+                <img src={story.img} className="w-full h-full object-cover" alt="" />
+              </div>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">{story.title[lang]}</span>
+          </button>
+        ))}
+      </section>
+
       {/* GRID CONFIGURATION */}
-      <main className="mt-12 px-4 max-w-7xl mx-auto space-y-24 pb-64 relative z-10">
+      <main className="mt-8 px-4 max-w-7xl mx-auto space-y-24 pb-64 relative z-10">
         {["Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map((catName) => {
           const items = filteredItems.filter(i => i.category === catName);
           if (items.length === 0) return null;
@@ -208,51 +267,77 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
-                {items.map((p) => (
-                  <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true, margin:"-50px"}} key={p.id} className={`${isDark ? 'bg-zinc-950/40 border-white/5 shadow-2xl hover:border-brand-orange/20' : 'bg-white/80 border-orange-100/50 shadow-md hover:border-brand-orange/30'} rounded-[3rem] p-4 border relative group overflow-hidden transition-all duration-300 hover:scale-[1.02] ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
-                    {isAdmin && (
-                        <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-brand-orange rounded-[3rem] p-4 text-center">
-                            <span className="text-3xl mb-2">{p.inStock ? '✅ Live' : '❌ Out'}</span>
-                            <span className="text-[10px] font-black uppercase tracking-wider">Toggle Stock</span>
+                {isLoading ? (
+                  Array.from({ length: 4 }).map((_, idx) => (
+                    <div key={idx} className={`${isDark ? 'bg-zinc-950/40 border-white/5' : 'bg-white/80 border-orange-100/50'} rounded-[3rem] p-4 border relative overflow-hidden h-[300px] flex flex-col justify-between`}>
+                      <div className={`w-full h-38 md:h-44 rounded-[2.2rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                      <div className="space-y-3 mt-4">
+                        <div className={`h-4 w-3/4 mx-auto rounded-md ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                        <div className={`h-6 w-1/2 mx-auto rounded-md ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                        <div className={`h-10 w-full rounded-[1.8rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  items.map((p) => (
+                    <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true, margin:"-50px"}} key={p.id} className={`${isDark ? 'bg-zinc-950/40 border-white/5 shadow-2xl hover:border-brand-orange/20' : 'bg-white/80 border-orange-100/50 shadow-md hover:border-brand-orange/30'} rounded-[3rem] p-4 border relative group overflow-hidden transition-all duration-300 hover:scale-[1.02] ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
+                      {isAdmin && (
+                          <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-brand-orange rounded-[3rem] p-4 text-center">
+                              <span className="text-3xl mb-2">{p.inStock ? '✅ Live' : '❌ Out'}</span>
+                              <span className="text-[10px] font-black uppercase tracking-wider">Toggle Stock</span>
+                          </button>
+                      )}
+                      <div className="relative rounded-[2.2rem] overflow-hidden mb-4.5 h-38 md:h-44 bg-zinc-900 shadow-inner">
+                        <img src={p.img} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />
+                        <div className={`absolute bottom-3 left-3 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-white ${isDark ? 'bg-black/60' : 'bg-orange-600/90 shadow-sm'}`}>⏱️ {prepTime}m</div>
+                        <div className="absolute top-3 right-3 backdrop-blur-md bg-black/60 px-2.5 py-1 rounded-xl text-[9px] font-black text-yellow-400 flex items-center gap-1">⭐ {p.rating}</div>
+                      </div>
+                      <div className="text-center px-1">
+                        <h3 className="text-xs font-black uppercase mb-1 h-12 flex items-center justify-center leading-tight tracking-tight italic font-display">{p.name[lang]}</h3>
+                        <p className="text-brand-orange font-black text-2xl mb-4.5 italic tracking-tighter">₹{p.price}</p>
+                        <button 
+                          disabled={!isKitchenOpen || !p.inStock}
+                          onClick={() => { haptic(); setShowCustomizer(p); }} 
+                          className={`w-full py-4.5 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-95 shadow-md ${isKitchenOpen && p.inStock ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-brand-orange/10 hover:brightness-110' : `${isDark ? 'bg-zinc-900/60 border border-white/5 text-zinc-500' : 'bg-gray-200/60 text-zinc-400'}`}`}
+                        >
+                          {!p.inStock ? 'SOLD OUT' : isKitchenOpen ? 'Customize' : 'CLOSED'}
                         </button>
-                    )}
-                    <div className="relative rounded-[2.2rem] overflow-hidden mb-4.5 h-38 md:h-44 bg-zinc-900 shadow-inner">
-                      <img src={p.img} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />
-                      <div className={`absolute bottom-3 left-3 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-white ${isDark ? 'bg-black/60' : 'bg-orange-600/90 shadow-sm'}`}>⏱️ {prepTime}m</div>
-                      <div className="absolute top-3 right-3 backdrop-blur-md bg-black/60 px-2.5 py-1 rounded-xl text-[9px] font-black text-yellow-400 flex items-center gap-1">⭐ {p.rating}</div>
-                    </div>
-                    <div className="text-center px-1">
-                      <h3 className="text-xs font-black uppercase mb-1 h-12 flex items-center justify-center leading-tight tracking-tight italic font-display">{p.name[lang]}</h3>
-                      <p className="text-brand-orange font-black text-2xl mb-4.5 italic tracking-tighter">₹{p.price}</p>
-                      <button 
-                        disabled={!isKitchenOpen || !p.inStock}
-                        onClick={() => { haptic(); setShowCustomizer(p); }} 
-                        className={`w-full py-4.5 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-95 shadow-md ${isKitchenOpen && p.inStock ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-brand-orange/10 hover:brightness-110' : `${isDark ? 'bg-zinc-900/60 border border-white/5 text-zinc-500' : 'bg-gray-200/60 text-zinc-400'}`}`}
-                      >
-                        {!p.inStock ? 'SOLD OUT' : isKitchenOpen ? 'Customize' : 'CLOSED'}
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
+                      </div>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </div>
           );
         })}
       </main>
 
-      {/* FLOATING ACTION CART BAR */}
+      {/* FLOATING ACTION CART BUBBLE */}
       <AnimatePresence>
         {subtotal > 0 && !orderStatus && (
-          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 left-0 right-0 z-[1000] px-6">
-            <button onClick={() => { haptic(); setShowCheckout(true); }} className={`w-full max-w-lg mx-auto p-4.5 rounded-[2.5rem] shadow-[0_15px_50px_rgba(255,77,0,0.2)] flex justify-between items-center border transition-all duration-300 ${isDark ? 'bg-white/95 text-black border-white/20 hover:bg-white' : 'bg-zinc-950/95 text-white border-zinc-800/80 hover:bg-zinc-950'}`}>
-               <div className="flex items-center gap-4 italic ml-3">
-                  <div className="bg-gradient-to-br from-brand-orange to-brand-amber h-12 w-12 rounded-2xl flex items-center justify-center text-2xl text-white font-black animate-bounce shadow-md">🛒</div>
-                  <div className="text-left leading-tight">
-                    <p className="text-[9px] font-black uppercase opacity-50 tracking-wider">Total Items: {cart.length}</p>
-                    <p className="text-3xl font-black tracking-tight font-display">₹{subtotal}</p>
-                  </div>
-               </div>
-               <div className={`px-8 py-3.5 rounded-[1.8rem] font-black text-[11px] uppercase tracking-widest transition-all ${isDark ? 'bg-zinc-950 text-white hover:bg-zinc-900' : 'bg-gradient-to-r from-brand-orange to-brand-amber text-white hover:brightness-115'}`}>Review Bill →</div>
+          <motion.div 
+            initial={{ scale: 0, opacity: 0 }} 
+            animate={{ scale: 1, opacity: 1 }} 
+            exit={{ scale: 0, opacity: 0 }} 
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="fixed bottom-8 right-8 z-[1000]"
+          >
+            <button 
+              onClick={() => { haptic(); setShowCheckout(true); }} 
+              className="relative w-18 h-18 rounded-full bg-gradient-to-br from-brand-orange to-brand-amber shadow-[0_10px_35px_rgba(255,77,0,0.4)] flex items-center justify-center hover:brightness-110 active:scale-95 transition-all group"
+            >
+              <div className="absolute inset-0 rounded-full bg-brand-orange animate-ping opacity-25 z-0" />
+              <span className="text-3xl z-10 transition-transform duration-300 group-hover:rotate-12">🛒</span>
+              {/* ITEM COUNT BADGE */}
+              <motion.div 
+                key={cart.length}
+                initial={{ scale: 0.6 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                className="absolute -top-1.5 -right-1.5 bg-white text-brand-orange text-xs font-black w-6.5 h-6.5 rounded-full flex items-center justify-center border-2 border-brand-orange shadow-md z-20"
+              >
+                {cart.length}
+              </motion.div>
             </button>
           </motion.div>
         )}
@@ -347,13 +432,30 @@ export default function Home() {
                 <h2 className="text-xl font-black uppercase tracking-tight italic font-display">{showCustomizer.name[lang]}</h2>
                 <button onClick={() => setShowCustomizer(null)} className="text-gray-500 font-bold hover:text-red-500 transition-all">✕</button>
               </div>
-              <p className="text-[10px] uppercase font-black tracking-widest opacity-50 mb-3.5 text-brand-orange">Choose Spice Level</p>
-              <div className="flex gap-3.5 mb-7">
-                {['Low', 'Medium', 'High'].map(spice => (
-                  <button key={spice} onClick={() => setCustomOptions({spice})} className={`flex-1 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider border-2 transition-all duration-200 active:scale-95 ${customOptions.spice === spice ? 'bg-gradient-to-r from-brand-orange to-brand-amber border-transparent text-white shadow-lg shadow-brand-orange/15 scale-105' : `${isDark ? 'border-zinc-800 text-zinc-500 hover:border-zinc-700' : 'border-gray-200 text-zinc-600 hover:border-gray-300'}`}`}>{spice}</button>
-                ))}
+              <p className="text-[10px] uppercase font-black tracking-widest opacity-50 mb-3 text-brand-orange">Choose Spice Level</p>
+              <div className="mb-7 px-2">
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="3" 
+                  value={customOptions.spice} 
+                  onChange={(e) => setCustomOptions({ spice: parseInt(e.target.value) })}
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-brand-orange"
+                  style={{
+                    background: customOptions.spice === 1 
+                      ? '#22c55e' 
+                      : customOptions.spice === 2 
+                        ? 'linear-gradient(to right, #f97316, #facc15)' 
+                        : 'linear-gradient(to right, #dc2626, #ff8800)'
+                  }}
+                />
+                <div className="flex justify-between text-[10px] font-black uppercase opacity-60 mt-3.5">
+                  <span className={customOptions.spice === 1 ? 'text-green-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️ Mild</span>
+                  <span className={customOptions.spice === 2 ? 'text-orange-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️🌶️ Medium</span>
+                  <span className={customOptions.spice === 3 ? 'text-red-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️🌶️🌶️ Hot</span>
+                </div>
               </div>
-              <button onClick={() => { haptic(); addToCart(showCustomizer, customOptions); setShowCustomizer(null); }} className="w-full bg-gradient-to-r from-brand-orange to-brand-amber text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-brand-orange/15 tracking-widest hover:brightness-110 active:scale-95 transition-all">Add to Basket</button>
+              <button onClick={(e) => handleAddToBasket(e)} className="w-full bg-gradient-to-r from-brand-orange to-brand-amber text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-brand-orange/15 tracking-widest hover:brightness-110 active:scale-95 transition-all">Add to Basket</button>
             </motion.div>
           </motion.div>
         )}
@@ -370,6 +472,73 @@ export default function Home() {
                 <motion.div initial={{width:0}} animate={{width:`${cookingProgress}%`}} className="h-full bg-gradient-to-r from-brand-orange to-brand-amber rounded-full shadow-[0_0_10px_rgba(255,77,0,0.8)]"></motion.div>
              </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* STORIES VIEWER */}
+      <AnimatePresence>
+        {activeStory !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/95 z-[6000] flex items-center justify-center p-4">
+            <div className="w-full max-w-md h-[80vh] relative rounded-[3rem] overflow-hidden shadow-2xl border border-white/10 flex flex-col justify-end p-8 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.9)), url(${storiesData[activeStory].img})` }}>
+              
+              {/* TOP STORY TIMER PROGRESS BARS */}
+              <div className="absolute top-6 left-6 right-6 flex gap-1.5 z-20">
+                {storiesData.map((_, sIdx) => (
+                  <div key={sIdx} className="h-1 bg-white/20 rounded-full flex-1 overflow-hidden">
+                    <div className="h-full bg-brand-orange rounded-full transition-all" style={{ width: sIdx < activeStory ? '100%' : sIdx === activeStory ? '100%' : '0%', transitionDuration: sIdx === activeStory ? '5s' : '0s' }} />
+                  </div>
+                ))}
+              </div>
+
+              {/* CLOSE BUTTON */}
+              <button onClick={() => setActiveStory(null)} className="absolute top-10 right-6 z-20 bg-black/50 text-white w-9 h-9 rounded-full font-black flex items-center justify-center backdrop-blur-md border border-white/10">✕</button>
+              
+              {/* NEXT / PREV BUTTON OVERLAYS */}
+              <div className="absolute inset-0 flex z-10">
+                <div onClick={() => setActiveStory(s => Math.max(0, s - 1))} className="w-1/3 h-full cursor-pointer" />
+                <div onClick={() => setActiveStory(s => s === storiesData.length - 1 ? null : s + 1)} className="w-2/3 h-full cursor-pointer" />
+              </div>
+
+              {/* STORY DESCRIPTION */}
+              <div className="relative z-20 text-left space-y-2 pointer-events-none">
+                <h4 className="text-3xl font-black uppercase italic text-brand-orange font-display tracking-tight leading-none">{storiesData[activeStory].title[lang]}</h4>
+                <p className="text-xs font-bold text-white/80 uppercase tracking-wide leading-relaxed">{storiesData[activeStory].highlight}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FLYING PARTICLES LAYER */}
+      <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+        {flyingParticles.map(p => (
+          <motion.div
+            key={p.id}
+            initial={{ x: p.x, y: p.y, scale: 1.5, opacity: 1 }}
+            animate={{ 
+              x: typeof window !== "undefined" ? window.innerWidth - 64 : 500, 
+              y: typeof window !== "undefined" ? window.innerHeight - 64 : 800, 
+              scale: 0.2, 
+              opacity: 0 
+            }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute w-8 h-8 rounded-full bg-gradient-to-r from-brand-orange to-brand-amber shadow-[0_0_15px_#ff4d00] flex items-center justify-center text-white text-xs font-black"
+          >
+            🔥
+          </motion.div>
+        ))}
+      </div>
+
+      {/* THEME TRANSITION RIPPLE OVERLAY */}
+      <AnimatePresence>
+        {themeTransition && (
+          <motion.div
+            initial={{ clipPath: `circle(0px at ${themeTransition.x}px ${themeTransition.y}px)` }}
+            animate={{ clipPath: `circle(${typeof window !== "undefined" ? Math.max(window.innerWidth, window.innerHeight) * 1.5 : 2000}px at ${themeTransition.x}px ${themeTransition.y}px)` }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className={`fixed inset-0 z-[99999] pointer-events-none ${themeTransition.toDark ? 'bg-gradient-to-b from-[#080808] via-[#0D0D0D] to-[#0A0A0A]' : 'bg-gradient-to-b from-[#FAF8F5] via-[#FFFDFB] to-[#F7F4EF]'}`}
+          />
         )}
       </AnimatePresence>
 
