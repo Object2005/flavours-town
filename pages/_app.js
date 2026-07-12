@@ -1,4 +1,4 @@
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import '../styles/globals.css';
 
 const inter = Inter({
@@ -7,15 +7,15 @@ const inter = Inter({
   display: 'swap',
 });
 
-const outfit = Outfit({
+const playfair = Playfair_Display({
   subsets: ['latin'],
-  variable: '--font-outfit',
+  variable: '--font-playfair',
   display: 'swap',
 });
 
 export default function App({ Component, pageProps }) {
   return (
-    <main className={`${inter.variable} ${outfit.variable} font-sans`}>
+    <main className={`${inter.variable} ${playfair.variable} font-sans`}>
       <Component {...pageProps} />
     </main>
   );

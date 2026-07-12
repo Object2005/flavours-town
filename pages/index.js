@@ -184,7 +184,7 @@ export default function Home() {
   };
 
   return (
-    <div className={`${isDark ? 'bg-gradient-to-b from-[#080808] via-[#0D0D0D] to-[#0A0A0A] text-white' : 'bg-gradient-to-b from-[#FAF8F5] via-[#FFFDFB] to-[#F7F4EF] text-black'} min-h-screen pb-44 transition-all duration-500 font-sans overflow-x-hidden relative`}>
+    <div className={`${isDark ? 'bg-gradient-to-b from-[#1C1613] via-[#120E0D] to-[#1C1613] text-[#FAF6F0]' : 'bg-gradient-to-b from-[#FAF6F0] via-[#FFFDFB] to-[#FAF6F0] text-[#1C1613]'} min-h-screen pb-44 transition-all duration-500 font-sans overflow-x-hidden relative`}>
       <Head>
         <title>98774-74778 | The Flavour's Town (PRO)</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -201,31 +201,31 @@ export default function Home() {
       </div>
 
       {/* STICKY TOP HEADER */}
-      <header className={`fixed top-0 w-full z-[1000] px-6 py-4 backdrop-blur-xl ${isDark ? 'bg-black/60 border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.8)]' : 'bg-white/60 border-orange-100/50 shadow-[0_4px_30px_rgba(255,77,0,0.05)]'} border-b flex justify-between items-center transition-colors duration-300`}>
+      <header className={`fixed top-0 w-full z-[1000] px-6 py-4 backdrop-blur-xl ${isDark ? 'bg-[#120E0D]/90 border-[#FAF6F0]/10' : 'bg-[#FAF6F0]/90 border-[#1C1613] shadow-sm'} border-b-2 flex justify-between items-center transition-colors duration-300`}>
         <div className="flex items-center gap-4">
-          <div className="bg-gradient-to-br from-brand-orange to-brand-amber h-11 w-11 rounded-2xl flex items-center justify-center text-white font-black italic shadow-[0_0_20px_rgba(255,77,0,0.4)] text-xl tracking-tighter">FT</div>
+          <div className="bg-brand-orange text-[#FAF6F0] h-11 w-11 rounded-2xl flex items-center justify-center font-display font-black text-xl tracking-tighter border-2 border-[#1C1613] shadow-neo">FT</div>
           <div className="flex flex-col leading-none">
             <h1 className="text-sm font-black uppercase tracking-tight font-display">The Flavour's Town</h1>
-            <span className="text-[10px] font-black text-brand-orange flex items-center gap-1.5 mt-0.5">
+            <span className="text-[10px] font-black text-brand-orange flex items-center gap-1.5 mt-0.5 font-display">
               <span className="w-1.5 h-1.5 bg-brand-orange rounded-full animate-ping"></span>
               98774-74778
             </span>
           </div>
         </div>
         <div className="flex gap-2 items-center">
-  <button onClick={(e) => handleThemeToggle(e)} className={`p-2.5 rounded-2xl border transition-all duration-300 ${isDark ? 'bg-zinc-950/40 border-white/5 hover:border-white/10 text-yellow-500' : 'bg-white/40 border-orange-100/50 hover:border-orange-200 text-zinc-700 shadow-sm'}`}>{isDark ? '☀️' : '🌙'}</button>
-          <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[10px] font-black bg-gradient-to-r from-brand-orange to-brand-amber text-white px-4 py-2.5 rounded-2xl uppercase shadow-lg shadow-brand-orange/20 hover:brightness-110 active:scale-95 transition-all">{lang === 'pu' ? 'EN' : 'ਪੰ'}</button>
-          <button onClick={() => { const p = prompt("Admin Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-9 h-9 rounded-2xl flex items-center justify-center text-brand-orange border transition-all duration-300 ${isDark ? 'bg-brand-orange/5 border-brand-orange/10 hover:border-brand-orange/30' : 'bg-brand-orange/10 border-brand-orange/20 hover:border-brand-orange/40'} font-black text-lg`}>⚙️</button>
+          <button onClick={(e) => handleThemeToggle(e)} className={`p-2.5 rounded-2xl border-2 border-[#1C1613] transition-all duration-300 ${isDark ? 'bg-stone-900 border-[#FAF6F0]/10 text-yellow-500' : 'bg-[#FFFDFB] text-zinc-700 shadow-neo'}`}>{isDark ? '☀️' : '🌙'}</button>
+          <button onClick={() => { haptic(); setLang(lang==='pu'?'en':'pu'); }} className="text-[10px] font-black bg-brand-orange text-[#FAF6F0] px-4 py-2.5 rounded-2xl uppercase border-2 border-[#1C1613] shadow-neo hover:brightness-110 active:scale-95 transition-all">{lang === 'pu' ? 'EN' : 'ਪੰ'}</button>
+          <button onClick={() => { const p = prompt("Admin Pass:"); if(p==="aashray778") setIsAdmin(!isAdmin); }} className={`w-9 h-9 rounded-2xl flex items-center justify-center text-brand-orange border-2 border-[#1C1613] transition-all duration-300 ${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 hover:border-brand-orange/30' : 'bg-[#FFFDFB] shadow-neo'} font-black text-lg`}>⚙️</button>
         </div>
       </header>
 
       {/* FILTER TABS */}
-      <nav className={`fixed top-[74px] w-full z-[900] py-4.5 backdrop-blur-md overflow-x-auto no-scrollbar flex gap-4 px-6 border-b transition-colors duration-300 ${isDark ? 'bg-black/40 border-white/5' : 'bg-white/40 border-orange-100/50'}`}>
+      <nav className={`fixed top-[74px] w-full z-[900] py-4.5 backdrop-blur-md overflow-x-auto no-scrollbar flex gap-4 px-6 border-b-2 border-[#1C1613] transition-colors duration-300 ${isDark ? 'bg-[#120E0D]/80' : 'bg-[#FAF6F0]/80'}`}>
         {["All", "Chaap", "Tikka", "Rolls", "Snacks", "Sweets"].map(cat => (
           <button 
             key={cat} 
             onClick={() => { haptic(); setActiveTab(cat); if(cat !== "All") scrollRefs.current[cat]?.scrollIntoView({behavior:'smooth', block:'start'}); }} 
-            className={`px-6 py-2 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all duration-300 ${activeTab === cat ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-lg shadow-brand-orange/20 border-transparent' : `border ${isDark ? 'bg-zinc-950/20 border-white/5 text-zinc-400 hover:border-white/10' : 'bg-white/30 border-orange-100/50 text-zinc-600 hover:border-orange-200'}`}`}
+            className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase whitespace-nowrap transition-all duration-300 border-2 border-[#1C1613] ${activeTab === cat ? 'bg-brand-orange text-white shadow-neo' : `${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 text-[#FAF6F0]/60' : 'bg-[#FFFDFB] text-[#1C1613]/80 hover:bg-[#FAF6F0]'}`}`}
           >
             #{cat}
           </button>
@@ -234,9 +234,9 @@ export default function Home() {
 
       {/* SEARCH SYSTEM */}
       <section className="pt-44 px-5 max-w-xl mx-auto">
-        <div className={`flex items-center px-6 py-4.5 rounded-[2rem] border transition-all duration-300 focus-within:shadow-[0_0_30px_rgba(255,77,0,0.1)] ${isDark ? 'bg-zinc-950/40 border-white/5 focus-within:border-brand-orange/30' : 'bg-white/80 border-orange-100/70 focus-within:border-brand-orange/40 shadow-sm'}`}>
+        <div className={`flex items-center px-6 py-4 rounded-2xl border-2 border-[#1C1613] transition-all duration-300 focus-within:shadow-neo-orange ${isDark ? 'bg-[#1C1613]/80 border-[#FAF6F0]/10 focus-within:border-brand-orange/30' : 'bg-[#FFFDFB] focus-within:border-brand-orange/40 shadow-neo'}`}>
            <span className="mr-3.5 text-xl opacity-50">🔍</span>
-           <input type="text" value={searchQuery} placeholder={lang === 'pu' ? "ਤੁਹਾਨੂੰ ਅੱਜ ਕੀ ਪਸੰਦ ਹੈ?..." : "Search menu items..."} className={`bg-transparent border-none outline-none w-full text-sm font-bold uppercase tracking-tight ${isDark ? 'text-white placeholder-zinc-600' : 'text-black placeholder-zinc-400'}`} onChange={(e) => setSearchQuery(e.target.value)} />
+           <input type="text" value={searchQuery} placeholder={lang === 'pu' ? "ਤੁਹਾਨੂੰ ਅੱਜ ਕੀ ਪਸੰਦ ਹੈ?..." : "Search menu items..."} className={`bg-transparent border-none outline-none w-full text-sm font-bold uppercase tracking-tight ${isDark ? 'text-white placeholder-[#FAF6F0]/30' : 'text-black placeholder-zinc-400'}`} onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
       </section>
 
@@ -244,12 +244,12 @@ export default function Home() {
       <section className="mt-8 px-6 max-w-xl mx-auto overflow-x-auto no-scrollbar flex gap-5 py-2 z-10 relative">
         {storiesData.map((story, idx) => (
           <button key={story.id} onClick={() => { haptic(); setActiveStory(idx); }} className="flex flex-col items-center gap-1.5 focus:outline-none shrink-0 group">
-            <div className="w-16 h-16 rounded-full p-[3px] bg-gradient-to-tr from-brand-orange to-brand-amber shadow-md group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full rounded-full border border-black overflow-hidden bg-zinc-900">
+            <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-brand-orange to-brand-amber border-2 border-[#1C1613] shadow-neo group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-full border border-[#1C1613]/10 overflow-hidden bg-zinc-900">
                 <img src={story.img} className="w-full h-full object-cover" alt="" />
               </div>
             </div>
-            <span className="text-[9px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">{story.title[lang]}</span>
+            <span className="text-[9px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity font-display">{story.title[lang]}</span>
           </button>
         ))}
       </section>
@@ -260,45 +260,45 @@ export default function Home() {
           const items = filteredItems.filter(i => i.category === catName);
           if (items.length === 0) return null;
           return (
-            <div key={catName} ref={el => scrollRefs.current[catName] = el} className="space-y-12 scroll-mt-48">
-              <div className="flex justify-between items-end border-b-2 border-brand-orange/10 pb-4 px-2">
-                 <h2 className="text-4xl font-black italic uppercase tracking-tight font-display bg-gradient-to-r from-brand-orange to-brand-amber bg-clip-text text-transparent">{catName}</h2>
-                 <span className="text-[10px] font-black opacity-40 uppercase tracking-widest text-brand-orange">Handcrafted Taste</span>
+            <div key={catName} ref={el => scrollRefs.current[catName] = el} className="space-y-10 scroll-mt-48">
+              <div className="flex justify-between items-end border-b-2 border-brand-orange/20 pb-4 px-2">
+                 <h2 className="text-3xl font-black uppercase tracking-tight font-display text-brand-orange">{catName}</h2>
+                 <span className="text-[10px] font-black opacity-50 uppercase tracking-widest text-brand-orange font-display">Handcrafted Taste</span>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
+              <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-8">
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className={`${isDark ? 'bg-zinc-950/40 border-white/5' : 'bg-white/80 border-orange-100/50'} rounded-[3rem] p-4 border relative overflow-hidden h-[300px] flex flex-col justify-between`}>
-                      <div className={`w-full h-38 md:h-44 rounded-[2.2rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                    <div key={idx} className={`${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 shadow-neo-dark' : 'bg-[#FFFDFB] border-2 border-[#1C1613] shadow-neo'} rounded-[2rem] p-5 border relative overflow-hidden h-[310px] flex flex-col justify-between`}>
+                      <div className={`w-full h-38 md:h-44 rounded-[1.5rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
                       <div className="space-y-3 mt-4">
                         <div className={`h-4 w-3/4 mx-auto rounded-md ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
                         <div className={`h-6 w-1/2 mx-auto rounded-md ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
-                        <div className={`h-10 w-full rounded-[1.8rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
+                        <div className={`h-10 w-full rounded-[1.2rem] ${isDark ? 'animate-shimmer' : 'animate-shimmer-light'}`} />
                       </div>
                     </div>
                   ))
                 ) : (
                   items.map((p) => (
-                    <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true, margin:"-50px"}} key={p.id} className={`${isDark ? 'bg-zinc-950/40 border-white/5 shadow-2xl hover:border-brand-orange/20' : 'bg-white/80 border-orange-100/50 shadow-md hover:border-brand-orange/30'} rounded-[3rem] p-4 border relative group overflow-hidden transition-all duration-300 hover:scale-[1.02] ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
+                    <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true, margin:"-50px"}} key={p.id} className={`${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 shadow-neo-dark hover:border-[#C87A53]/50' : 'bg-[#FFFDFB] border-2 border-[#1C1613] shadow-neo hover:border-[#C87A53]'} rounded-[2rem] p-5 border relative group overflow-hidden transition-all duration-300 ${!p.inStock ? 'grayscale opacity-40' : ''}`}>
                       {isAdmin && (
-                          <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white border-4 border-dashed border-brand-orange rounded-[3rem] p-4 text-center">
+                          <button onClick={() => setMenu(prev => prev.map(m => m.id === p.id ? {...m, inStock: !m.inStock} : m))} className="absolute inset-0 z-50 bg-[#120E0D]/95 flex flex-col items-center justify-center text-[#FAF6F0] border-4 border-dashed border-[#C87A53] rounded-[2rem] p-4 text-center">
                               <span className="text-3xl mb-2">{p.inStock ? '✅ Live' : '❌ Out'}</span>
-                              <span className="text-[10px] font-black uppercase tracking-wider">Toggle Stock</span>
+                              <span className="text-[10px] font-black uppercase tracking-wider font-display">Toggle Stock</span>
                           </button>
                       )}
-                      <div className="relative rounded-[2.2rem] overflow-hidden mb-4.5 h-38 md:h-44 bg-zinc-900 shadow-inner">
+                      <div className="relative rounded-[1.5rem] overflow-hidden mb-4 h-38 md:h-44 bg-[#1C1613] border border-[#1C1613]/10">
                         <img src={p.img} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />
-                        <div className={`absolute bottom-3 left-3 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-white ${isDark ? 'bg-black/60' : 'bg-orange-600/90 shadow-sm'}`}>⏱️ {prepTime}m</div>
-                        <div className="absolute top-3 right-3 backdrop-blur-md bg-black/60 px-2.5 py-1 rounded-xl text-[9px] font-black text-yellow-400 flex items-center gap-1">⭐ {p.rating}</div>
+                        <div className={`absolute bottom-3 left-3 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-white ${isDark ? 'bg-black/70' : 'bg-stone-900/90 shadow-sm'}`}>⏱️ {prepTime}m</div>
+                        <div className="absolute top-3 right-3 backdrop-blur-md bg-black/70 px-2.5 py-1 rounded-xl text-[9px] font-black text-yellow-400 flex items-center gap-1">⭐ {p.rating}</div>
                       </div>
                       <div className="text-center px-1">
-                        <h3 className="text-xs font-black uppercase mb-1 h-12 flex items-center justify-center leading-tight tracking-tight italic font-display">{p.name[lang]}</h3>
-                        <p className="text-brand-orange font-black text-2xl mb-4.5 italic tracking-tighter">₹{p.price}</p>
+                        <h3 className="text-sm font-black uppercase mb-1 h-10 flex items-center justify-center leading-tight tracking-tight font-display">{p.name[lang]}</h3>
+                        <p className="text-brand-orange font-black text-2xl mb-4 italic tracking-tighter">₹{p.price}</p>
                         <button 
                           disabled={!isKitchenOpen || !p.inStock}
                           onClick={() => { haptic(); setShowCustomizer(p); }} 
-                          className={`w-full py-4.5 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-95 shadow-md ${isKitchenOpen && p.inStock ? 'bg-gradient-to-r from-brand-orange to-brand-amber text-white shadow-brand-orange/10 hover:brightness-110' : `${isDark ? 'bg-zinc-900/60 border border-white/5 text-zinc-500' : 'bg-gray-200/60 text-zinc-400'}`}`}
+                          className={`w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none border-2 border-[#1C1613] ${isKitchenOpen && p.inStock ? 'bg-brand-orange text-white hover:brightness-110 shadow-neo' : `${isDark ? 'bg-stone-900 border-[#FAF6F0]/15 text-stone-500' : 'bg-stone-200 text-stone-400'}`}`}
                         >
                           {!p.inStock ? 'SOLD OUT' : isKitchenOpen ? 'Customize' : 'CLOSED'}
                         </button>
@@ -343,20 +343,19 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* MASTER CONSOLE PANEL */}
       <AnimatePresence>
         {isAdmin && (
-          <motion.div initial={{y:-300, opacity:0}} animate={{y:0, opacity:1}} exit={{y:-300, opacity:0}} className={`fixed top-24 left-4 right-4 z-[1100] p-7 rounded-[3rem] shadow-2xl border backdrop-blur-2xl transition-colors duration-300 ${isDark ? 'bg-zinc-950/90 border-brand-orange/20 text-white' : 'bg-white/95 border-orange-200 text-gray-900'}`}>
+          <motion.div initial={{y:-300, opacity:0}} animate={{y:0, opacity:1}} exit={{y:-300, opacity:0}} className={`fixed top-24 left-4 right-4 z-[1100] p-7 rounded-[2rem] border-2 backdrop-blur-2xl transition-colors duration-300 ${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 text-[#FAF6F0]' : 'bg-[#FFFDFB] border-[#1C1613] text-[#1C1613] shadow-neo'}`}>
             <h3 className="text-xl font-black uppercase italic text-brand-orange mb-5 border-b border-brand-orange/10 pb-2.5 font-display">Master Admin Panel</h3>
             <div className="grid grid-cols-2 gap-4">
-                <div className={`p-4.5 rounded-[2rem] border ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50 border-orange-100/50'} text-center shadow-sm`}>
-                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider">Store Status</p>
-                    <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`w-full py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-wider transition-all duration-200 active:scale-95 ${isKitchenOpen ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>
+                <div className={`p-4.5 rounded-[1.5rem] border-2 ${isDark ? 'bg-stone-900/30 border-[#FAF6F0]/10' : 'bg-[#FFFDFB] border-[#1C1613] text-center shadow-neo'}`}>
+                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider font-display">Store Status</p>
+                    <button onClick={() => setIsKitchenOpen(!isKitchenOpen)} className={`w-full py-3 rounded-xl border-2 border-[#1C1613] font-black text-[10px] uppercase tracking-wider transition-all duration-200 active:scale-95 ${isKitchenOpen ? 'bg-red-600 text-white shadow-neo' : 'bg-green-600 text-white shadow-neo'}`}>
                         {isKitchenOpen ? 'Close Kitchen' : 'Open Kitchen'}
                     </button>
                 </div>
-                <div className={`p-4.5 rounded-[2rem] border ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50 border-orange-100/50'} text-center shadow-sm`}>
-                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider">Prep Duration</p>
+                <div className={`p-4.5 rounded-[1.5rem] border-2 ${isDark ? 'bg-stone-900/30 border-[#FAF6F0]/10' : 'bg-[#FFFDFB] border-[#1C1613] text-center shadow-neo'}`}>
+                    <p className="text-[10px] font-black uppercase mb-3.5 opacity-50 tracking-wider font-display">Prep Duration</p>
                     <div className="flex items-center justify-between px-2">
                         <button onClick={()=>setPrepTime(p=>Math.max(5,p-5))} className="w-8 h-8 bg-brand-orange/10 rounded-full font-black text-brand-orange hover:bg-brand-orange/20 active:scale-90 transition-all">-</button>
                         <span className="text-lg font-black font-display">{prepTime}m</span>
@@ -371,19 +370,19 @@ export default function Home() {
       {/* CHECKOUT PORTAL MODAL */}
       <AnimatePresence>
         {showCheckout && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] flex items-end justify-center p-4">
-             <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950/95 border-white/5' : 'bg-white border-orange-100'} w-full border rounded-[3rem] p-7 max-w-2xl overflow-y-auto max-h-[85vh] shadow-2xl relative`}>
-                <div className="flex justify-between items-center mb-6 border-b border-brand-orange/10 pb-4">
-                  <h2 className="text-2xl font-black uppercase italic text-brand-orange font-display">Your Basket</h2>
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/85 backdrop-blur-md z-[2000] flex items-end justify-center p-4">
+             <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 text-[#FAF6F0]' : 'bg-[#FFFDFB] border-2 border-[#1C1613] text-[#1C1613] shadow-neo'} w-full rounded-[2rem] p-7 max-w-2xl overflow-y-auto max-h-[85vh] relative`}>
+                <div className="flex justify-between items-center mb-6 border-b-2 border-brand-orange/20 pb-4">
+                  <h2 className="text-2xl font-black uppercase text-brand-orange font-display">Your Basket</h2>
                   <button onClick={() => setShowCheckout(false)} className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white w-9 h-9 rounded-full font-black flex items-center justify-center transition-all">✕</button>
                 </div>
                 
                 <div className="space-y-3 mb-6 max-h-52 overflow-y-auto pr-2 no-scrollbar">
                   {cart.map((c) => (
-                    <div key={c.cartId} className={`flex justify-between items-center border p-4.5 rounded-[1.8rem] transition-colors ${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50/50 border-orange-50/50'}`}>
+                    <div key={c.cartId} className={`flex justify-between items-center border-2 p-4.5 rounded-[1.5rem] transition-colors ${isDark ? 'bg-stone-900/30 border-[#FAF6F0]/10' : 'bg-[#FFFDFB] border-[#1C1613]'}`}>
                        <div className="text-left">
                          <p className="text-sm font-black uppercase tracking-tight">{c.name[lang]}</p>
-                         <p className="text-[9px] text-brand-orange font-black uppercase tracking-widest mt-0.5">{c.spice} spice</p>
+                         <p className="text-[9px] text-brand-orange font-black uppercase tracking-widest mt-0.5 font-display">{c.spice} spice</p>
                        </div>
                        <div className="flex items-center gap-4">
                          <p className="font-black text-lg font-display">₹{c.price}</p>
@@ -394,29 +393,29 @@ export default function Home() {
                 </div>
 
                 {/* ADDONS CONTROLLER */}
-                <h3 className="text-[10px] font-black uppercase opacity-50 mb-3 tracking-widest text-brand-orange">Enhance Your Plate</h3>
+                <h3 className="text-[10px] font-black uppercase opacity-50 mb-3 tracking-widest text-brand-orange font-display">Enhance Your Plate</h3>
                 <div className="grid grid-cols-3 gap-3 mb-6">
                    {addonsData.map(a => (
-                     <div key={a.id} className={`${isDark ? 'bg-zinc-900/30 border-white/5' : 'bg-gray-50/50 border-orange-50/50'} border p-3 rounded-2xl text-center shadow-sm`}>
-                        <p className="text-[10px] font-black truncate uppercase tracking-tight">{a.name[lang]}</p>
-                        <p className="text-xs font-black text-brand-orange mb-2 font-display">+₹{a.price}</p>
-                        <div className={`flex justify-between items-center rounded-xl p-1 ${isDark ? 'bg-zinc-950/80' : 'bg-gray-200/50'}`}>
-                          <button onClick={() => setAddons({...addons, [a.id]: Math.max(0, (addons[a.id] || 0) - 1)})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">-</button>
-                          <span className="text-[10px] font-black">{addons[a.id] || 0}</span>
-                          <button onClick={() => setAddons({...addons, [a.id]: (addons[a.id] || 0) + 1})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">+</button>
-                        </div>
-                     </div>
-                   ))}
+                      <div key={a.id} className={`${isDark ? 'bg-stone-900/30 border-[#FAF6F0]/10 border' : 'bg-[#FFFDFB] border-2 border-[#1C1613] shadow-sm'} p-3 rounded-[1.5rem] text-center`}>
+                         <p className="text-[10px] font-black truncate uppercase tracking-tight">{a.name[lang]}</p>
+                         <p className="text-xs font-black text-brand-orange mb-2 font-display">+₹{a.price}</p>
+                         <div className={`flex justify-between items-center rounded-xl p-1 border ${isDark ? 'bg-stone-950/80 border-[#FAF6F0]/10' : 'bg-stone-100 border-[#1C1613]'}`}>
+                           <button onClick={() => setAddons({...addons, [a.id]: Math.max(0, (addons[a.id] || 0) - 1)})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">-</button>
+                           <span className="text-[10px] font-black font-display">{addons[a.id] || 0}</span>
+                           <button onClick={() => setAddons({...addons, [a.id]: (addons[a.id] || 0) + 1})} className="text-brand-orange font-black px-2 hover:opacity-80 active:scale-75 transition-all">+</button>
+                         </div>
+                      </div>
+                    ))}
                 </div>
 
-                <div className="flex justify-between items-center mb-6 border-t border-brand-orange/10 pt-4 px-2">
-                   <p className="text-[9px] font-black uppercase tracking-widest opacity-50">Total Bill</p>
+                <div className="flex justify-between items-center mb-6 border-t-2 border-brand-orange/20 pt-4 px-2">
+                   <p className="text-[9px] font-black uppercase tracking-widest opacity-50 font-display">Total Bill</p>
                    <p className="text-4xl font-black text-brand-orange font-display">₹{subtotal}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                   <button onClick={() => processOrder('UPI')} className="bg-[#1A73E8] hover:bg-[#1557b0] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 transition-all duration-200 active:scale-95">💳 UPI INSTANT</button>
-                   <button onClick={() => processOrder('WA')} className="bg-[#25D366] hover:bg-[#20ba59] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-green-500/10 transition-all duration-200 active:scale-95">📱 WHATSAPP</button>
+                   <button onClick={() => processOrder('UPI')} className="bg-[#1A73E8] hover:bg-[#1557b0] text-white py-4 rounded-xl border-2 border-[#1C1613] font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-neo transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">💳 UPI INSTANT</button>
+                   <button onClick={() => processOrder('WA')} className="bg-[#25D366] hover:bg-[#20ba59] text-white py-4 rounded-xl border-2 border-[#1C1613] font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-neo transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">📱 WHATSAPP</button>
                 </div>
              </motion.div>
           </motion.div>
@@ -426,13 +425,13 @@ export default function Home() {
       {/* LIVE ITEM CUSTOMIZER DRAWER */}
       <AnimatePresence>
         {showCustomizer && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/80 backdrop-blur-md z-[3000] flex items-end justify-center p-4">
-            <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-zinc-950/95 border-white/5' : 'bg-white border-orange-100'} w-full border rounded-[3rem] p-7 max-w-md shadow-2xl relative`}>
-              <div className="flex justify-between items-center mb-5 border-b border-brand-orange/10 pb-3.5">
-                <h2 className="text-xl font-black uppercase tracking-tight italic font-display">{showCustomizer.name[lang]}</h2>
-                <button onClick={() => setShowCustomizer(null)} className="text-gray-500 font-bold hover:text-red-500 transition-all">✕</button>
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-black/85 backdrop-blur-md z-[3000] flex items-end justify-center p-4">
+            <motion.div initial={{y:300}} animate={{y:0}} className={`${isDark ? 'bg-[#1C1613] border-[#FAF6F0]/10 text-white' : 'bg-[#FFFDFB] border-2 border-[#1C1613] shadow-neo'} w-full border rounded-[2rem] p-7 max-w-md relative`}>
+              <div className="flex justify-between items-center mb-5 border-b-2 border-brand-orange/20 pb-3.5">
+                <h2 className="text-xl font-black uppercase tracking-tight font-display">{showCustomizer.name[lang]}</h2>
+                <button onClick={() => setShowCustomizer(null)} className="text-gray-500 font-bold hover:text-red-500 transition-all font-display">✕</button>
               </div>
-              <p className="text-[10px] uppercase font-black tracking-widest opacity-50 mb-3 text-brand-orange">Choose Spice Level</p>
+              <p className="text-[10px] uppercase font-black tracking-widest opacity-50 mb-3 text-brand-orange font-display">Choose Spice Level</p>
               <div className="mb-7 px-2">
                 <input 
                   type="range" 
@@ -443,19 +442,19 @@ export default function Home() {
                   className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-brand-orange"
                   style={{
                     background: customOptions.spice === 1 
-                      ? '#22c55e' 
+                      ? '#A3B19B' 
                       : customOptions.spice === 2 
-                        ? 'linear-gradient(to right, #f97316, #facc15)' 
-                        : 'linear-gradient(to right, #dc2626, #ff8800)'
+                        ? '#DDA15E' 
+                        : '#BC4749'
                   }}
                 />
                 <div className="flex justify-between text-[10px] font-black uppercase opacity-60 mt-3.5">
-                  <span className={customOptions.spice === 1 ? 'text-green-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️ Mild</span>
-                  <span className={customOptions.spice === 2 ? 'text-orange-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️🌶️ Medium</span>
-                  <span className={customOptions.spice === 3 ? 'text-red-500 scale-110 font-black transition-all' : 'transition-all'}>🌶️🌶️🌶️ Hot</span>
+                  <span className={customOptions.spice === 1 ? 'text-[#A3B19B] scale-110 font-black transition-all font-display' : 'transition-all font-display'}>🌶️ Mild</span>
+                  <span className={customOptions.spice === 2 ? 'text-[#DDA15E] scale-110 font-black transition-all font-display' : 'transition-all font-display'}>🌶️🌶️ Medium</span>
+                  <span className={customOptions.spice === 3 ? 'text-[#BC4749] scale-110 font-black transition-all font-display' : 'transition-all font-display'}>🌶️🌶️🌶️ Hot</span>
                 </div>
               </div>
-              <button onClick={(e) => handleAddToBasket(e)} className="w-full bg-gradient-to-r from-brand-orange to-brand-amber text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-brand-orange/15 tracking-widest hover:brightness-110 active:scale-95 transition-all">Add to Basket</button>
+              <button onClick={(e) => handleAddToBasket(e)} className="w-full bg-brand-orange text-white py-4 rounded-xl border-2 border-[#1C1613] font-black text-[10px] uppercase shadow-neo hover:brightness-110 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all tracking-widest">Add to Basket</button>
             </motion.div>
           </motion.div>
         )}
@@ -537,7 +536,7 @@ export default function Home() {
             animate={{ clipPath: `circle(${typeof window !== "undefined" ? Math.max(window.innerWidth, window.innerHeight) * 1.5 : 2000}px at ${themeTransition.x}px ${themeTransition.y}px)` }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className={`fixed inset-0 z-[99999] pointer-events-none ${themeTransition.toDark ? 'bg-gradient-to-b from-[#080808] via-[#0D0D0D] to-[#0A0A0A]' : 'bg-gradient-to-b from-[#FAF8F5] via-[#FFFDFB] to-[#F7F4EF]'}`}
+            className={`fixed inset-0 z-[99999] pointer-events-none ${themeTransition.toDark ? 'bg-gradient-to-b from-[#1C1613] via-[#120E0D] to-[#1C1613]' : 'bg-gradient-to-b from-[#FAF6F0] via-[#FFFDFB] to-[#FAF6F0]'}`}
           />
         )}
       </AnimatePresence>

@@ -2,9 +2,9 @@
 
 @theme {
   --font-sans: var(--font-inter), sans-serif;
-  --font-display: var(--font-outfit), sans-serif;
-  --color-brand-orange: #ff4d00;
-  --color-brand-amber: #ff8800;
+  --font-display: var(--font-playfair), serif;
+  --color-brand-orange: #C87A53;
+  --color-brand-amber: #DDA15E;
 }
 
 @layer utilities {
@@ -14,6 +14,15 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .shadow-neo {
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.9);
+  }
+  .shadow-neo-orange {
+    box-shadow: 4px 4px 0px 0px #C87A53;
+  }
+  .shadow-neo-dark {
+    box-shadow: 4px 4px 0px 0px rgba(255, 255, 255, 0.15);
   }
 }
 
